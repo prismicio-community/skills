@@ -1,0 +1,9 @@
+{
+  "name": "prismic-community",
+  "description": "Prismic's public AI plugins and skills for marketing, content, and website teams",
+  "owner": {
+    "name": "Prismic",
+    "url": "https://prismic.io"
+  },
+  "plugins": []
+}

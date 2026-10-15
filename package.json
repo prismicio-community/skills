@@ -1,0 +1,28 @@
+{
+  "name": "prismicio-community-skills",
+  "private": true,
+  "description": "Validation and packaging scripts for Prismic's public AI plugins and skills",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "library": {
+    "repository": "prismicio-community/skills",
+    "branch": "main",
+    "releaseTag": "library"
+  },
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "build": "node scripts/build.mjs",
+    "verify": "node scripts/verify-packages.mjs",
+    "check:discovery": "node scripts/check-discovery.mjs",
+    "check": "npm run validate && npm run build && npm run verify",
+    "new:plugin": "node scripts/new.mjs plugin",
+    "new:skill": "node scripts/new.mjs skill"
+  },
+  "devDependencies": {
+    "fflate": "0.8.3",
+    "yaml": "2.9.1"
+  }
+}

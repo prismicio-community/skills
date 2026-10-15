@@ -1,0 +1,38 @@
+name: Validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Check plugins, skills, and pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Validate marketplaces, skills, and library-context pages
+        run: npm run validate
+
+      - name: Build downloads and library.json
+        run: npm run build
+
+      - name: Verify download contents
+        run: npm run verify
+
+      - name: Install Claude Code and Codex
+        run: npm install --global @anthropic-ai/claude-code@2.1.299 @openai/codex@0.162.1
+
+      - name: Check discovery and installs with the skills CLI, Claude Code, and Codex
+        run: npm run check:discovery

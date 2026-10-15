@@ -1,0 +1,66 @@
+name: Publish downloads
+
+# Every push to main rebuilds the downloads and library.json and replaces the
+# assets on one rolling GitHub release, so download URLs never change:
+#   https://github.com/<owner>/<repo>/releases/download/<releaseTag>/<file>
+# <releaseTag> comes from "library.releaseTag" in package.json.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-downloads
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish downloads
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run validate
+
+      - run: npm run build
+
+      - run: npm run verify
+
+      - name: Upload to the rolling release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # With no plugins or skills yet, dist/skills/* and dist/plugins/* expand to nothing.
+          shopt -s nullglob
+          TAG=$(node -p "require('./package.json').library.releaseTag")
+
+          # Point the tag at this commit.
+          git tag --force "$TAG" "$GITHUB_SHA"
+          git push --force origin "refs/tags/$TAG"
+
+          if ! gh release view "$TAG" > /dev/null 2>&1; then
+            gh release create "$TAG" --title "Library downloads" --notes "Downloads for the Prismic AI library." --latest
+          fi
+
+          gh release upload "$TAG" dist/library.json dist/skills/* dist/plugins/* --clobber
+
+          # Remove downloads for plugins and skills that no longer exist.
+          for asset in $(gh release view "$TAG" --json assets --jq '.assets[].name'); do
+            if [ ! -e "dist/$asset" ] && [ ! -e "dist/skills/$asset" ] && [ ! -e "dist/plugins/$asset" ]; then
+              gh release delete-asset "$TAG" "$asset" --yes
+            fi
+          done
+
+          gh release edit "$TAG" --notes "Downloads for the Prismic AI library, built from $GITHUB_SHA. Rebuilt on every change to main."
