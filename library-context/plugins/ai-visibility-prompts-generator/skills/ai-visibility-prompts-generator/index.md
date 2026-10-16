@@ -1,5 +1,5 @@
 ---
-title: AI Visibility Prompts Generator Skill
+title: AI Visibility Prompt Generator Skill
 summary: Generate tagged, category-relevant buyer prompts to track in AI visibility tools, split equally across four buyer stages.
 description: A free AI skill that writes the buyer prompts to track in Peec AI, Profound and other AI visibility tools.
 categories: [seo, research]

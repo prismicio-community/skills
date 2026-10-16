@@ -18,7 +18,7 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "AI Visibility Prompts Generator",
+    "displayName": "AI Visibility Prompt Generator",
     "shortDescription": "Prompts for AI visibility",
     "longDescription": "Generate the prompts to track in AI visibility tools such as Peec AI or Profound: a tagged, category-relevant buyer prompt library split equally across four buyer stages.",
     "developerName": "Prismic",
