@@ -18,6 +18,19 @@
       "skills": [
         "./skills/geo-action-plan"
       ]
+    },
+    {
+      "name": "personalized-landing-pages",
+      "source": "./plugins/personalized-landing-pages",
+      "strict": false,
+      "description": "Build personalized landing pages in Prismic for target accounts, grounded in CRM and web research, with an offer fit verdict and copy that fits your layout.",
+      "author": {
+        "name": "Prismic",
+        "url": "https://prismic.io"
+      },
+      "skills": [
+        "./skills/personalized-landing-pages"
+      ]
     }
   ]
 }
