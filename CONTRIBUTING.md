@@ -2,6 +2,8 @@
 
 You can add or update plugins, skills, and library pages through a pull request. Everything on this page works in the GitHub website, so you don't need to install anything.
 
+Maintainers and coding agents: also read [AGENTS.md](AGENTS.md) for the repository rules and [docs/website-integration.md](docs/website-integration.md) for the data the library page uses.
+
 ## Where things live
 
 | You want to change | Edit this | Who sees it |
@@ -16,6 +18,25 @@ The two halves never mix:
 - `library-context/` holds only what the website shows.
 
 If a skill needs a template or a reference document while it works, that file goes inside the skill folder. If the website needs a screenshot, that image goes in `library-context/`.
+
+The full layout:
+
+```
+.claude-plugin/marketplace.json     Marketplace for Claude, Claude Code, and the skills CLI
+.agents/plugins/marketplace.json    Marketplace for ChatGPT and Codex
+plugins/<plugin>/                   One installable plugin
+  .codex-plugin/plugin.json         Plugin details for ChatGPT and Codex
+  assets/                           The plugin icon
+  skills/<skill>/                   One installable skill
+    SKILL.md                        Instructions the assistant follows
+    references/, assets/, scripts/  Files the skill uses while it works
+library-context/                    Library page content (not installed)
+  taxonomy.yml                      Allowed categories and platforms
+  plugins/<plugin>/index.md         Plugin page
+  plugins/<plugin>/skills/<skill>/index.md   Skill page
+docs/                               Templates and the website data format
+scripts/                            Validation and packaging
+```
 
 ## Edit a library page
 
