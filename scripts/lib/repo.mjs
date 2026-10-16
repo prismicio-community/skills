@@ -11,6 +11,7 @@ export const PATHS = {
   claudeMarketplace: '.claude-plugin/marketplace.json',
   codexMarketplace: '.agents/plugins/marketplace.json',
   plugins: 'plugins',
+  prompts: 'prompts',
   context: 'library-context',
   taxonomy: 'library-context/taxonomy.yml',
   dist: 'dist',
@@ -134,6 +135,7 @@ export function gitCommit() {
 export const contextPath = {
   plugin: (p) => `${PATHS.context}/plugins/${p}/index.md`,
   skill: (p, s) => `${PATHS.context}/plugins/${p}/skills/${s}/index.md`,
+  prompt: (name) => `${PATHS.context}/prompts/${name}/index.md`,
 };
 
 // The plugin and skill folders on disk, with each skill's SKILL.md parsed.
@@ -148,4 +150,19 @@ export function loadPlugins() {
     });
     return { name, dir, codexManifest: `${dir}/.codex-plugin/plugin.json`, skills };
   });
+}
+
+// The prompt files on disk: prompts/<name>.md, copied by visitors exactly as written.
+// Anything else in prompts/ is returned with its entry type so validate can report it.
+export function loadPrompts() {
+  if (!exists(PATHS.prompts)) return [];
+  return fs
+    .readdirSync(abs(PATHS.prompts), { withFileTypes: true })
+    .filter((e) => !isJunk(e.name))
+    .map((e) => {
+      const file = `${PATHS.prompts}/${e.name}`;
+      const isPrompt = e.isFile() && e.name.endsWith('.md');
+      return { name: isPrompt ? e.name.slice(0, -3) : e.name, file, entry: e.name, isPrompt };
+    })
+    .sort((a, b) => (a.entry < b.entry ? -1 : a.entry > b.entry ? 1 : 0));
 }

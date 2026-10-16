@@ -1,8 +1,8 @@
 # Library page content
 
-This folder holds the text and images the Prismic website shows for each plugin and skill. Nothing here is installed. Assistants never see it.
+This folder holds the text and images the Prismic website shows for each plugin, skill, and prompt. Nothing here is installed. Assistants never see it.
 
-The folders mirror `plugins/`:
+The folders mirror `plugins/` and `prompts/`:
 
 ```
 library-context/
@@ -11,9 +11,11 @@ library-context/
   plugins/<plugin>/assets/                     Plugin page images
   plugins/<plugin>/skills/<skill>/index.md     Skill page
   plugins/<plugin>/skills/<skill>/assets/      Skill page images
+  prompts/<prompt>/index.md                    Prompt page
+  prompts/<prompt>/assets/                     Prompt page images
 ```
 
-Every plugin and skill in `plugins/` must have a page here, and every page here must match a plugin or skill. Pages are always named `index.md`, never `SKILL.md`.
+Every plugin and skill in `plugins/` and every prompt in `prompts/` must have a page here, and every page here must match a plugin, skill, or prompt. Pages are always named `index.md`, never `SKILL.md`.
 
 ## Page format
 
@@ -54,11 +56,11 @@ examples:
 | `featured` | No | Highlight the item on the library page | `true` or `false` (default `false`) |
 | `draft` | No | Hide the page from the website | `true` or `false` (default `false`) |
 | `image` | No | Card image | A path to a file in an `assets/` folder, such as `./assets/cover.png` |
-| `badge` | No | A short label on the card, such as "Any CMS" | Under 20 characters |
+| `badge` | No | A short label on the card, such as "Any CMS". On a prompt, say what it makes, such as "Dashboard" | Under 20 characters |
 | `output` | No | What the user gets, shown on the card | Under 80 characters |
-| `platforms` | No | Where it works | Ids from `taxonomy.yml` |
+| `platforms` | Prompts only | Where it works | Ids from `taxonomy.yml` |
 | `requirements` | No | Connectors and tools it needs | A list. Each item has `name`, `required` (`true` or `false`), and optional `details` |
-| `examples` | Recommended | Prompts visitors can copy | A list. Each item has `prompt` and optional `note` |
+| `examples` | Recommended | Prompts visitors can copy. On a prompt page, use follow-ups that change the result | A list. Each item has `prompt` and optional `note` |
 
 Wrap a value in double quotes if it contains a colon followed by a space, or starts with `[`, `{`, `*`, `&`, `!`, `#`, or `@`.
 
@@ -74,6 +76,8 @@ Each `## ` heading becomes a section of the page, in the order you write them.
 | `## Pitfalls` | No | Common mistakes and how to avoid them |
 
 You can add other sections. Don't explain how to install the plugin or skill. The website adds the install steps for every item automatically.
+
+On a prompt page, don't paste the prompt itself. The website shows it, with a Copy button, from `prompts/<prompt>.md`. A `## How to use` section that says what happens after pasting works well.
 
 ## Categories and platforms
 

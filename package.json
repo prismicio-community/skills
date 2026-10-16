@@ -1,7 +1,7 @@
 {
   "name": "prismicio-community-skills",
   "private": true,
-  "description": "Validation and packaging scripts for Prismic's public AI plugins and skills",
+  "description": "Validation and packaging scripts for Prismic's public AI plugins, skills, and prompts",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -19,7 +19,8 @@
     "check:discovery": "node scripts/check-discovery.mjs",
     "check": "npm run validate && npm run build && npm run verify",
     "new:plugin": "node scripts/new.mjs plugin",
-    "new:skill": "node scripts/new.mjs skill"
+    "new:skill": "node scripts/new.mjs skill",
+    "new:prompt": "node scripts/new.mjs prompt"
   },
   "devDependencies": {
     "fflate": "0.8.3",

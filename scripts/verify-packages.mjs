@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 // Checks what the build produced, independently of how it was produced:
-// every plugin and skill has exactly one download, each download contains
-// exactly the package's files (no website content, no clutter), and
-// library.json matches the files on disk.
+// every plugin, skill, and prompt has exactly one download, each download
+// contains exactly the package's files (no website content, no clutter), each
+// prompt download is the prompt file byte for byte, and library.json matches
+// the files on disk.
 // Run with: npm run build && npm run verify
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import { PATHS, abs, exists, readJson, walkFiles, parseFrontmatter, loadPlugins } from './lib/repo.mjs';
+import { PATHS, abs, exists, readJson, walkFiles, parseFrontmatter, loadPlugins, loadPrompts } from './lib/repo.mjs';
 import { readZip } from './lib/zip.mjs';
 
 const failures = [];
@@ -19,6 +20,7 @@ if (!exists(`${PATHS.dist}/library.json`)) {
 }
 const library = readJson(`${PATHS.dist}/library.json`);
 const plugins = loadPlugins();
+const prompts = loadPrompts().filter((p) => p.isPrompt);
 const expectedFiles = new Set(['library.json']);
 
 const sameSet = (label, actual, expected) => {
@@ -28,7 +30,8 @@ const sameSet = (label, actual, expected) => {
   for (const x of a) if (!e.has(x)) fail(`${label}: unexpected ${x}`);
 };
 
-function checkDownload(item, rel) {
+// The built file's bytes, after checking its size and checksum against library.json.
+function checkFile(item, rel) {
   expectedFiles.add(rel);
   const file = `${PATHS.dist}/${rel}`;
   if (!exists(file)) return fail(`${item.id}: ${file} was not built`), null;
@@ -36,7 +39,12 @@ function checkDownload(item, rel) {
   if (item.download.bytes !== bytes.length) fail(`${item.id}: library.json says ${item.download.bytes} bytes, file is ${bytes.length}`);
   const sha = crypto.createHash('sha256').update(bytes).digest('hex');
   if (item.download.sha256 !== sha) fail(`${item.id}: library.json checksum does not match ${file}`);
-  const zip = readZip(abs(file));
+  return bytes;
+}
+
+function checkDownload(item, rel) {
+  if (!checkFile(item, rel)) return null;
+  const zip = readZip(abs(`${PATHS.dist}/${rel}`));
   sameSet(`${item.id} library.json contents`, item.download.contents, Object.keys(zip));
   for (const p of Object.keys(zip)) {
     if (/(^|\/)(library-context|\.DS_Store|Thumbs\.db|node_modules|\.git)(\/|$)/.test(p)) fail(`${item.id}: ${p} must not be packaged`);
@@ -89,8 +97,26 @@ for (const plugin of plugins) {
   }
 }
 
-const knownIds = new Set(plugins.flatMap((p) => [`plugin:${p.name}`, ...p.skills.map((s) => `skill:${s.name}`)]));
-for (const item of library.items) if (!knownIds.has(item.id)) fail(`${item.id}: in library.json but not in plugins/`);
+for (const prompt of prompts) {
+  const n = prompt.name;
+  const item = library.items.find((i) => i.id === `prompt:${n}`);
+  if (!item) {
+    fail(`prompt:${n}: missing from library.json`);
+    continue;
+  }
+  // Visitors copy the text and download the file, so both must be the source exactly.
+  const source = fs.readFileSync(abs(prompt.file));
+  const bytes = checkFile(item, `prompts/${n}.md`);
+  if (bytes && !bytes.equals(source)) fail(`prompt:${n}: ${n}.md differs from ${prompt.file}`);
+  if (item.prompt?.markdown !== decode(source).replace(/^\uFEFF/, '')) fail(`prompt:${n}: library.json "prompt.markdown" differs from ${prompt.file}`);
+  if (item.prompt?.file !== `${n}.md`) fail(`prompt:${n}: library.json "prompt.file" should be "${n}.md"`);
+}
+
+const knownIds = new Set([
+  ...plugins.flatMap((p) => [`plugin:${p.name}`, ...p.skills.map((s) => `skill:${s.name}`)]),
+  ...prompts.map((p) => `prompt:${p.name}`),
+]);
+for (const item of library.items) if (!knownIds.has(item.id)) fail(`${item.id}: in library.json but not in plugins/ or prompts/`);
 if (new Set(library.items.map((i) => i.download.file)).size !== library.items.length) fail('two downloads share a file name');
 
 const built = walkFiles(PATHS.dist);
