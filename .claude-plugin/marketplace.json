@@ -66,6 +66,22 @@
       ]
     },
     {
+      "name": "system-of-context",
+      "source": "./plugins/system-of-context",
+      "strict": false,
+      "description": "Build your company's System of Context, the truth layer AI assistants read before writing about you, then check drafts against it and keep it current.",
+      "author": {
+        "name": "Prismic",
+        "url": "https://prismic.io"
+      },
+      "skills": [
+        "./skills/system-of-context",
+        "./skills/build-system-of-context",
+        "./skills/system-of-context-claim-check",
+        "./skills/system-of-context-refresh"
+      ]
+    },
+    {
       "name": "personalized-landing-pages",
       "source": "./plugins/personalized-landing-pages",
       "strict": false,

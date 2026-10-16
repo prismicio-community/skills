@@ -53,6 +53,18 @@
       "category": "Productivity"
     },
     {
+      "name": "system-of-context",
+      "source": {
+        "source": "local",
+        "path": "./plugins/system-of-context"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "personalized-landing-pages",
       "source": {
         "source": "local",

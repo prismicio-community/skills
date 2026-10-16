@@ -1,0 +1,38 @@
+{
+  "name": "system-of-context",
+  "version": "0.1.0",
+  "description": "Build your company's System of Context, the truth layer AI assistants read before writing about you, then check drafts against it and keep it current.",
+  "author": {
+    "name": "Prismic",
+    "url": "https://prismic.io"
+  },
+  "repository": "https://github.com/prismicio-community/skills",
+  "license": "MIT",
+  "keywords": [
+    "context",
+    "positioning",
+    "brand-voice",
+    "messaging",
+    "fact-checking",
+    "content-governance"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "System of Context",
+    "shortDescription": "A truth layer for your brand",
+    "longDescription": "Build your company's System of Context, the truth layer AI assistants read before writing about you, then check drafts against it and keep it current.",
+    "developerName": "Prismic",
+    "category": "Productivity",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "logoDark": "./assets/icon.svg",
+    "capabilities": [
+      "Skills"
+    ],
+    "defaultPrompt": [
+      "Build a System of Context for our company.",
+      "Check this draft against our System of Context before it ships.",
+      "Refresh our System of Context."
+    ]
+  }
+}
