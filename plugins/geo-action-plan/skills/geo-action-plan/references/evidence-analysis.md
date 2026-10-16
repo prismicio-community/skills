@@ -6,7 +6,7 @@ Read this during Step 1 (citation layer) and after Step 2 (SERP layer). It cover
 - The citation layer
 - The SERP layer
 - Combining the layers
-- Theme clustering
+- Clustering
 - Patterns that change the plan
 
 ## The citation layer
@@ -24,7 +24,7 @@ From the AI visibility tool's cited pages and cited domains (Peec AI: `get_url_r
 
 **Competitor concentration.** The brands mentioned on each cited URL (Peec AI: `mentioned_brand_ids`, resolved through `list_brands`) show which brands the cited pages actually name. A page citing five competitors and not the brand is the clearest possible off-site target. With Peec AI, the `gap` filter on both report tools does this directly: `{field: "gap", operator: "gte", value: 2}` returns sources where the own brand is absent but at least two competitors are present.
 
-**UGC share.** Reddit, Quora, YouTube, LinkedIn, forums. These cannot be won with on-site pages. Report the share in chat and the Read Me, and route the specific threads to the off-site tab. Never convert them into content rows.
+**UGC share.** Reddit, Quora, YouTube, LinkedIn, forums. These cannot be won with on-site pages. Report the share in chat and the Read Me, and route the specific threads to the off-site tab. A UGC page can join a content cluster as a demand signal, but a cluster made only of UGC is never a content row.
 
 **Format signals.** Scan cited page titles for "we tested", "we analyzed", years, prices, "vs", "alternatives". These formats outperform in nearly every dataset and should shape the briefs. Reading the top few cited pages (the tool's indexed content, or a fetch) confirms whether the format signal is real (an actual methodology section) or just a title claim.
 
@@ -32,9 +32,9 @@ From the AI visibility tool's cited pages and cited domains (Peec AI: `get_url_r
 
 From the searches run in Step 2:
 
-**Dominant domains** — many queries × many distinct URLs is the "one page per phrasing" pattern. Name the domains doing it; it is usually the strategy the plan should copy.
+**Dominant domains** — many queries × many distinct URLs means a domain runs many pages across the topic. Name the domains doing it. Their pages still go through clustering: pages that say the same thing are one topic, however many phrasings they target.
 
-**Cross-query overlap** — what fraction of pages appear for 2+ intents. Low overlap means retrieval is highly phrasing-sensitive, which is the empirical justification for planning separate scoped pages per phrasing rather than one page trying to serve several.
+**Cross-query overlap** — what fraction of pages appear for 2+ intents. Low overlap means retrieval is phrasing-sensitive: make sure each topic title keeps the phrasing the evidence uses most, and that the page answers the other phrasings in its cluster in its H2s.
 
 **Per-intent incumbent sets** with appearance counts and weighted scores. When the citation layer is thin for an intent, these stand in as the demand and strength signal.
 
@@ -50,15 +50,13 @@ Join on domain and on URL. Three groups matter:
 
 Every "sources to beat" cell must label which layer each incumbent came from, with its real metric. Never merge the two metrics into one invented score.
 
-## Theme clustering
+## Clustering
 
-Cluster cited and ranking URLs by topic using keyword matching on title + URL, then sum retrievals (citation layer) or weighted score (SERP layer) per theme. The themes with the most retrieval volume are the demand signal that drives priority.
-
-Build the keyword map from the actual dataset rather than a fixed list: pull the recurring nouns and modifiers out of the fan-out queries and prompt texts in scope, and use those as cluster seeds. A cluster with high volume and no owning plan row is a gap; a cluster with several rows is a cannibalization risk.
+Clustering is SKILL.md Step 3: pool every cited and ranking page, then group pages that would tell a reader essentially the same thing. Group by substance, never by keyword matching or by format. Sum retrievals and citations (citation layer) and weighted score (SERP layer) per cluster; that total is the cluster's evidence strength in the priority rubric. A cluster with strong evidence and no plan row is a gap; a cluster with several rows is a cannibalization risk.
 
 ## Patterns that change the plan
 
 - **Own domain absent from both layers entirely** — expect this when AI visibility is near zero. It is not an error; it means every row is Create or Fix, and it makes the technical audit more urgent, since invisibility is sometimes a crawler problem rather than a content problem.
-- **One domain winning nearly everything** — check whether it is a single page or many. Many pages means the phrasing-per-page strategy works in this category and should be copied.
+- **One domain winning nearly everything** — check whether it is a single page or many. Many pages that answer different questions mean there are many distinct topics to cover; many pages that say the same thing are one cluster, and one strong page can take them on.
 - **High UGC share** — the on-site plan will be smaller than expected and the off-site tab larger. Say this in chat rather than padding the content plan to look substantial.
-- **Thin evidence for a prompt in scope** — few cited sources and weak SERP incumbents is the cheapest possible win. Flag it prominently; these rows usually deserve P0 despite low absolute volume.
+- **Thin evidence for a prompt in scope** — few cited sources and weak SERP incumbents is the cheapest possible win. Flag it prominently; its topics qualify for P0 when the prompt match is direct and the fit is High, despite low absolute volume.

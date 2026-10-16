@@ -12,7 +12,7 @@ Turn what AI assistants and search engines already retrieve into an executable p
 The plan rests on three layers, all pulled live, never uploaded:
 
 - **Citation layer.** The URLs AI assistants retrieve and cite for the tracked prompts, from the user's AI visibility tool (with Peec AI: `get_url_report` / `get_domain_report`).
-- **SERP layer.** The pages that rank for the fan-out queries the engines issue while answering (with Peec AI: `list_search_queries`), then a live `web_search` per intent.
+- **SERP layer.** The pages that rank for the fan-out queries the engines issue while answering (with Peec AI: `list_search_queries`), then a live web search per intent.
 - **The brand's existing estate.** The sitemap and the brand's CMS (see Brand settings), used to decide whether each topic is a new page or an update to one that already exists.
 
 ## Brand settings
@@ -35,7 +35,6 @@ The citation and fan-out data comes from the user's AI visibility tool, read thr
 
 The steps below name Peec AI's tools as the worked example. With another tool, use its equivalent tool for the same data (`references/data-sources.md` has the known mappings) and keep its metrics as reported.
 
-**Where the reference files conflict with this SKILL.md, this file wins.** In particular, `references/plan-methodology.md` says to merge by default, cut weak intents, cap P0s tightly and treat section-level phrasings as H2s only. Those rules are superseded by the clustering method below. Use the reference files for brief templates, the evidence ladder, off-site classification and the technical audit.
 
 ## Phase map
 
@@ -86,7 +85,7 @@ Record the page-type distribution, top domains, UGC share and whether the own do
 Pull every fan-out query for the scope (Peec AI: `list_search_queries`, paging until `totalCount` is exhausted). If the tool has no fan-out queries and the user agreed to the fallback, use the tracked prompts in scope, phrased as searches, and record that in the Read Me and Method. Then:
 
 1. **Merge queries into search intents.** Deduplicate exact and near-exact strings and merge queries that would clearly return the same results. An intent's weight is the sum of its members' occurrence counts. (This merge only decides how many searches to run. Content clustering happens later and works on pages, not queries.)
-2. **Search.** One `web_search` per intent, using the query close to verbatim.
+2. **Search.** Run one web search per intent, using the query close to verbatim.
 3. **Record verbatim.** Every returned result's URL and title, exactly as returned, into the run JSON. Don't filter by your opinion of quality.
 
 Method caveats every time: the search tool returns roughly the top 10 per query, and it is not literally Google.
@@ -183,7 +182,7 @@ Score each cluster on five things and assign a priority:
 4. **Winnability**: incumbent strength, and whether the brand already has a page (Update rows are usually cheaper wins).
 5. **Readiness**: whether the brand has the asset the angle needs (data, a customer story, testing).
 
-- **P0**: strong evidence, direct prompt match, High fit, startable now. Usually 10–15% of rows.
+- **P0**: strong evidence, direct prompt match, High fit, startable now. A topic for a prompt with thin, weak incumbents also qualifies when the match is direct and the fit is High, because it's the cheapest win available. Usually 10–15% of rows.
 - **P1**: strong on most of the five, or High fit with moderate evidence.
 - **P2**: everything else, including all Low-fit topics. Low fit lowers priority; it never removes a topic.
 
@@ -229,47 +228,17 @@ Build the run JSON (schema at the top of `scripts/build_geo_workbook.py`, plus t
 python scripts/build_geo_workbook.py run.json output.xlsx
 ```
 
-Then add the **Cited Sources** and **Topic Clusters** tabs, which the build script doesn't produce. Run `python scripts/add_tabs.py run.json output.xlsx` (the same code is below for reference):
+Then add the **Cited Sources** and **Topic Clusters** tabs, which the build script doesn't produce:
 
-```python
-import json, sys
-from openpyxl import load_workbook
-from openpyxl.styles import Alignment, Font, PatternFill
-run = json.load(open(sys.argv[1])); wb = load_workbook(sys.argv[2])
-H = PatternFill("solid", fgColor="1F3864"); HF = Font(color="FFFFFF", bold=True)
-def sheet(name, head, rows, widths, after):
-    if name in wb.sheetnames: del wb[name]
-    ws = wb.create_sheet(name, wb.sheetnames.index(after) + 1)
-    ws.append(head)
-    for r in rows: ws.append(r)
-    for i, w in enumerate(widths): ws.column_dimensions[chr(65 + i)].width = w
-    for c in ws[1]: c.fill, c.font = H, HF
-    for row in ws.iter_rows(min_row=2):
-        for c in row: c.alignment = Alignment(wrap_text=True, vertical="top")
-    ws.freeze_panes = "A2"
-cid = {}
-for c in run.get("clusters", []):
-    for m in c["members"]: cid.setdefault(m["url"].rstrip("/").lower(), c["id"])
-src = sorted(run.get("citation_sources", []), key=lambda s: (-(s.get("retrievals") or 0), -(s.get("citations") or 0)))
-sheet("Cited Sources", ["URL", "Title", "Domain", "Page type", "Retrievals", "Citations", "Citation rate", "Brands mentioned", "Cluster"],
-      [[s["url"], s.get("title", ""), s.get("domain", ""), s.get("classification", ""), s.get("retrievals"), s.get("citations"),
-        s.get("citation_rate"), ", ".join(s.get("mentioned_brands", [])), cid.get(s["url"].rstrip("/").lower(), "")] for s in src],
-      [60, 50, 24, 14, 11, 11, 11, 50, 9], "Read Me")
-rows = []
-for c in run.get("clusters", []):
-    for i, m in enumerate(c["members"]):
-        rows.append([c["id"] if i == 0 else "", c["topic"] if i == 0 else "", c.get("fit", "") if i == 0 else "",
-                     c.get("action", "") if i == 0 else "", c.get("existing_url", "") if i == 0 else "",
-                     c.get("plan_row", "") if i == 0 else "", m["title"], m["url"], m["layer"], m["metric"]])
-sheet("Topic Clusters", ["Cluster", "Topic (brand title)", "Fit", "Action", "Existing brand page", "Plan row",
-                         "Member page title", "Member URL", "Layer", "Metric"], rows,
-      [8, 46, 8, 10, 40, 8, 50, 55, 9, 26], "Cited Sources")
-wb.save(sys.argv[2]); print("tabs:", wb.sheetnames)
+```bash
+python scripts/add_tabs.py run.json output.xlsx
 ```
+
+The build script fails loudly, writing nothing, when the plan is broken: a run that searched fewer than half its merged intents, a title with no evidence, a row with no incumbent, or a cross-reference that doesn't resolve. Fix what it reports and run it again.
 
 Final tab order: Read Me · Cited Sources · Topic Clusters · Coverage · SERP Pages · SERP Domains · Site Inventory · Content Plan · Off-site Targets · Threads · Method.
 
-**Google Sheet.** If a Google Drive connector is available, run `python scripts/upload_to_drive.py output.xlsx "<title>"`. Only pass the payload to the Google Drive connector's create-file tool if it's small enough to copy exactly (roughly under 20,000 base64 characters); a single wrong character corrupts the file. If it's larger, deliver the xlsx and tell the user it opens as a Sheet once uploaded to Drive.
+**Google Sheet.** If a Google Drive connector is available, run `python scripts/upload_to_drive.py output.xlsx "<title>"`. It approves an upload only when the base64 payload is under 20,000 characters, short enough to copy exactly into the Google Drive connector's file-upload tool (a single wrong character corrupts the file). Upload only when it approves, with the details it prints. Otherwise deliver the xlsx and tell the user it opens as a Google Sheet once they upload it to Drive.
 
 **Always send the xlsx** to the user.
 
@@ -277,9 +246,18 @@ In chat, lead with the numbers (pages pooled, clusters found, Update vs Create s
 
 ## Running across many prompts
 
-State lives in the `_state.json` the build script writes. Store it where Brand settings say plans and state go (Google Drive by default), because the working filesystem resets between sessions. Each new run: fetch the state from there, run Steps 0–6 for the new prompt, then `python scripts/build_geo_workbook.py new_run.json output.xlsx --merge state.json`, and re-run `add_tabs.py` on the merged run.
+State lives in the `_state.json` the build script writes. Store it where Brand settings say plans and state go (Google Drive by default), because the working filesystem resets between sessions. Each new run: fetch the state from there, run Steps 0–6 for the new prompt, then:
 
-**Clusters carry across runs.** Before creating a new cluster, check whether an existing cluster from an earlier prompt already covers the same content. If it does, add the new members to it and add the new prompt to that row's prompts; don't create a duplicate topic. The Coverage tab records which prompts have been run. Re-running a prompt already covered replaces that prompt's contribution by default and keeps the earlier run as history; ask first if the user wants to compare plans over time.
+```bash
+python scripts/build_geo_workbook.py new_run.json output.xlsx --merge state.json
+python scripts/add_tabs.py output_state.json output.xlsx
+```
+
+Pass `add_tabs.py` the merged state the build wrote (`output_state.json`), not `new_run.json`, so the Cited Sources and Topic Clusters tabs cover every prompt. Save that state file back to the same place for the next run.
+
+**Clusters carry across runs.** Before creating a new cluster, check whether an existing cluster in the state already covers the same content. If it does, give the new cluster `"same_as": "<existing cluster id>"` (or use the same topic title, or the same `title_evidence` on its plan row): the merge adds its members to the existing cluster and the new prompt to that row, instead of creating a duplicate topic. Any other new cluster and row are appended with fresh IDs and numbers, and their cross-references are renumbered to match.
+
+**Re-running a prompt** already in the state replaces that prompt's earlier searches, rows and clusters, so nothing counts twice. Rows another prompt also produced stay, and a row the re-run produces again keeps its number. The Coverage tab keeps the earlier run as history. If the user wants to compare plans over time instead, ask first, and build the re-run as a separate workbook without `--merge`.
 
 ## Quality checklist before delivering
 
@@ -294,7 +272,7 @@ State lives in the `_state.json` the build script writes. Store it where Brand s
 - No brief contains a statistic the brand didn't supply.
 - The Cited Sources tab lists every citation-layer URL with metrics and its cluster.
 - Off-site competitor list was confirmed with the user; competitor pages are only on the "unlikely" list.
-- The build script validated the plan, and `add_tabs.py` ran.
+- The build script validated the plan, including coverage, and `add_tabs.py` ran (on the merged state, for a merged run).
 
 ## Compatibility
 

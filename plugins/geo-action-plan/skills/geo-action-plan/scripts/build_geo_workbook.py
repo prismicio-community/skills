@@ -11,17 +11,27 @@ Tabs produced (fixed order):
     Content Plan | Off-site Targets | Threads | Method
 
 The script fails loudly rather than shipping a broken plan. It validates that:
+  * the run searched at least half of its merged intents, and searches_run
+    matches the searches recorded
   * every content row's title traces to a phrasing in the evidence
   * every content row names at least one incumbent with a metric
   * every Action is legal
   * every cross-referenced row number resolves
   * priorities and off-site ownership classes are legal values
 
---merge accumulates across runs: SERP pages dedupe by normalized URL, plan rows
-dedupe by target phrasing. A repeat intent gains the new prompt in its
-"prompts this targets" cell instead of spawning a duplicate row. Re-running a
-prompt already present replaces that prompt's contribution and records the
-previous run in Coverage as history.
+--merge accumulates across runs:
+  * Searches and plan rows are tagged with the prompt IDs that produced them.
+    Re-running a prompt already in the state removes that prompt's earlier
+    searches and rows before the new run is added, so it never counts twice.
+    The previous run stays in the Coverage tab as history.
+  * Plan rows dedupe by target phrasing (title_evidence). A repeat phrasing adds
+    the new prompt to the existing row instead of creating a duplicate.
+  * New rows get the next free numbers, and their refs, the row numbers in their
+    guardrail text, and their clusters' plan_row are remapped to match.
+  * Clusters carry across runs. A new cluster joins an existing one when it
+    names it in "same_as", has the same topic title, or points at a plan row
+    that merged into an existing row; its members are added. Otherwise it is
+    appended with a fresh ID.
 
 run.json schema
 ---------------
@@ -39,6 +49,11 @@ run.json schema
                            "why": "why no row, and what would change the answer"}],
              "create_only_mode": false},
   "coverage": {"raw_queries": 68, "merged_intents": 22, "searches_run": 22},
+  "clusters": [
+      {"id": "C07", "topic": "...", "fit": "High", "action": "Create",
+       "existing_url": "", "plan_row": 12, "same_as": "C03 (optional, on merge)",
+       "members": [{"url": "...", "title": "...", "layer": "SERP", "metric": "..."}]}
+  ],
   "serp_searches": [
       {"query": "best AEO tools (merged: 3 variants)", "weight": 9,
        "results": [{"url": "https://...", "title": "..."}]}
@@ -76,6 +91,7 @@ run.json schema
 
 import argparse
 import json
+import re
 import sys
 from collections import defaultdict
 from datetime import date
@@ -118,6 +134,27 @@ BORDER = Border(left=THIN, right=THIN, top=THIN, bottom=THIN)
 # --------------------------------------------------------------------------
 # validation
 # --------------------------------------------------------------------------
+
+def validate_coverage(run):
+    """Check one run's own search coverage. Run this on a single run, before merging."""
+    errors = []
+    cov = run.get("coverage") or {}
+    recorded = len(run.get("serp_searches") or [])
+    searches_run = cov.get("searches_run")
+    intents = cov.get("merged_intents")
+    if searches_run is not None and searches_run != recorded:
+        errors.append(
+            f"coverage: searches_run is {searches_run} but {recorded} searches are recorded "
+            f"in serp_searches; record every search that was run"
+        )
+    if intents:
+        if recorded * 2 < intents:
+            errors.append(
+                f"coverage: only {recorded} of {intents} merged intents were searched; a run "
+                f"must cover at least half. Search the rest, or narrow the scope"
+            )
+    return errors
+
 
 def validate(run):
     """Return a list of human-readable errors. Empty list means the run is sound."""
@@ -212,13 +249,45 @@ def norm_url(u):
     return (u or "").strip().rstrip("/").lower()
 
 
+ROW_REF_RE = re.compile(r"\b(rows?\s+#?|#)(\d+(?:\s*(?:,|and|&)\s*#?\d+)*)", re.IGNORECASE)
+
+
+def remap_text(text, mapping):
+    """Rewrite row numbers in guardrail text ("row 3", "rows 3 and 5", "#3") in one pass."""
+    if not text or not mapping:
+        return text
+
+    def fix(m):
+        nums = re.sub(r"\d+", lambda d: str(mapping.get(int(d.group()), d.group())), m.group(2))
+        return m.group(1) + nums
+
+    return ROW_REF_RE.sub(fix, text)
+
+
+def _ids(item):
+    return set(item.get("prompt_ids") or [])
+
+
 def merge_runs(state, run):
     """Fold a new run into accumulated state. Returns the merged run dict."""
     if not state:
         return run
 
     merged = json.loads(json.dumps(state))
+    run = json.loads(json.dumps(run))
     new_prompts = set(run.get("scope", {}).get("prompt_ids") or [])
+    prior_prompts = set(merged.get("scope", {}).get("prompt_ids") or [])
+
+    # Tag anything untagged with the prompts that produced it, so a later re-run
+    # of the same prompt can find and replace it.
+    for s in merged.get("serp_searches") or []:
+        s.setdefault("prompt_ids", sorted(prior_prompts))
+    for row in merged.get("content_plan") or []:
+        row.setdefault("prompt_ids", sorted(prior_prompts))
+    for s in run.get("serp_searches") or []:
+        s.setdefault("prompt_ids", sorted(new_prompts))
+    for row in run.get("content_plan") or []:
+        row.setdefault("prompt_ids", sorted(new_prompts))
 
     # Coverage history: a repeat prompt replaces its own contribution.
     history = merged.get("coverage_history")
@@ -252,16 +321,128 @@ def merge_runs(state, run):
         )
     merged["coverage_history"] = history
 
-    # SERP searches: replace searches from repeated prompts, append the rest.
-    merged["serp_searches"] = (merged.get("serp_searches") or []) + (
-        run.get("serp_searches") or []
-    )
+    # SERP searches: drop the repeated prompts' earlier searches, then append.
+    kept = []
+    for s in merged.get("serp_searches") or []:
+        ids = _ids(s)
+        if ids and ids <= new_prompts:
+            continue
+        s["prompt_ids"] = sorted(ids - new_prompts)
+        kept.append(s)
+    merged["serp_searches"] = kept + (run.get("serp_searches") or [])
 
-    # Citation sources dedupe by URL, keeping the higher retrieval count.
+    # Plan rows: drop rows that only the repeated prompts produced.
+    removed = {}  # old row number -> title_evidence key
+    plan = []
+    for row in merged.get("content_plan") or []:
+        ids = _ids(row)
+        if ids and ids <= new_prompts:
+            removed[row.get("num")] = (row.get("title_evidence") or "").strip().lower()
+            continue
+        row["prompt_ids"] = sorted(ids - new_prompts)
+        plan.append(row)
+
+    # Clusters pointing at a removed row belong to the repeated run; drop them.
+    clusters = [c for c in merged.get("clusters") or [] if c.get("plan_row") not in removed]
+
+    # Add the new run's rows, deduping by phrasing and numbering new rows.
+    by_phrase = {(r.get("title_evidence") or "").strip().lower(): r for r in plan}
+    used = [r.get("num", 0) for r in plan] + list(removed)
+    next_num = max([n for n in used if isinstance(n, int)], default=0) + 1
+    num_map = {}  # new run's row number -> merged row number
+    reuse = {k: n for n, k in removed.items() if k}
+    fresh = []
+    for row in run.get("content_plan") or []:
+        key = (row.get("title_evidence") or "").strip().lower()
+        old = row.get("num")
+        if key and key in by_phrase:
+            existing = by_phrase[key]
+            num_map[old] = existing.get("num")
+            for p in row.get("prompts", []):
+                if p not in existing.setdefault("prompts", []):
+                    existing["prompts"].append(p)
+            existing["prompt_ids"] = sorted(_ids(existing) | _ids(row))
+            have = {norm_url(x.get("url")) for x in existing.get("sources_to_beat", [])}
+            for s in row.get("sources_to_beat", []):
+                if norm_url(s.get("url")) not in have:
+                    existing.setdefault("sources_to_beat", []).append(s)
+        else:
+            if key in reuse:
+                row["num"] = reuse.pop(key)  # a re-run keeps its row's old number
+            else:
+                row["num"] = next_num
+                next_num += 1
+            num_map[old] = row["num"]
+            plan.append(row)
+            fresh.append(row)
+            if key:
+                by_phrase[key] = row
+
+    # Remap the new rows' cross-references to the merged numbering. A ref that
+    # does not resolve in the new run is kept as an unresolvable marker so that
+    # validation fails loudly instead of pointing at the wrong row.
+    for row in fresh:
+        row["refs"] = [num_map.get(x, f"{x}?") for x in row.get("refs") or []]
+        row["guardrail"] = remap_text(row.get("guardrail", ""), num_map)
+
+    # Rows that survived but referred to a removed row: point them at the re-added
+    # row with the same phrasing, or drop the ref and say so.
+    readded = {(r.get("title_evidence") or "").strip().lower(): r.get("num") for r in fresh}
+    removed_map = {old: readded[k] for old, k in removed.items() if k in readded}
+    fresh_ids = {id(r) for r in fresh}
+    for row in plan:
+        if id(row) in fresh_ids:
+            continue
+        refs = []
+        for x in row.get("refs") or []:
+            if x in removed:
+                if x in removed_map:
+                    refs.append(removed_map[x])
+                else:
+                    row["guardrail"] = (row.get("guardrail", "") + f" (row {x} was removed when its prompt was re-run)").strip()
+            else:
+                refs.append(x)
+        row["refs"] = refs
+        row["guardrail"] = remap_text(row.get("guardrail", ""), removed_map)
+    plan.sort(key=lambda r: r.get("num") if isinstance(r.get("num"), int) else 0)
+    merged["content_plan"] = plan
+
+    # Clusters carry across runs.
+    by_id = {c.get("id"): c for c in clusters}
+    by_topic = {(c.get("topic") or "").strip().lower(): c for c in clusters}
+    by_row = {c.get("plan_row"): c for c in clusters}
+    def next_id():
+        nums = [int(m.group()) for c in clusters for m in [re.search(r"\d+", str(c.get("id", "")))] if m]
+        return f"C{(max(nums, default=0) + 1):02d}"
+    for c in run.get("clusters") or []:
+        row = num_map.get(c.get("plan_row"), c.get("plan_row"))
+        same = str(c.get("same_as") or "").split(" ")[0]
+        target = (by_id.get(same) if same else None) \
+            or by_topic.get((c.get("topic") or "").strip().lower()) \
+            or (by_row.get(row) if row not in [r.get("num") for r in fresh] else None)
+        if target:
+            have = {norm_url(m.get("url")) for m in target.get("members", [])}
+            for m in c.get("members", []):
+                if norm_url(m.get("url")) not in have:
+                    target.setdefault("members", []).append(m)
+        else:
+            c = dict(c)
+            c.pop("same_as", None)
+            c["id"] = next_id()
+            c["plan_row"] = row
+            clusters.append(c)
+            by_id[c["id"]] = c
+            by_topic[(c.get("topic") or "").strip().lower()] = c
+            by_row[row] = c
+    merged["clusters"] = clusters
+
+    # Citation sources dedupe by URL, keeping the higher count.
+    def strength(s):
+        return ((s.get("retrievals") or 0), (s.get("citations") or 0))
     by_url = {norm_url(s["url"]): s for s in merged.get("citation_sources", [])}
     for s in run.get("citation_sources", []):
         k = norm_url(s["url"])
-        if k not in by_url or (s.get("retrievals") or 0) > (by_url[k].get("retrievals") or 0):
+        if k not in by_url or strength(s) > strength(by_url[k]):
             by_url[k] = s
     merged["citation_sources"] = list(by_url.values())
 
@@ -270,30 +451,6 @@ def merge_runs(state, run):
     for i in run.get("inventory", []):
         inv[norm_url(i["url"])] = i
     merged["inventory"] = list(inv.values())
-
-    # Plan rows dedupe by target phrasing: a repeat intent gains the prompt.
-    plan = merged.get("content_plan", [])
-    by_phrase = {(r.get("title_evidence") or "").strip().lower(): r for r in plan}
-    next_num = max([r.get("num", 0) for r in plan], default=0) + 1
-    for row in run.get("content_plan", []):
-        key = (row.get("title_evidence") or "").strip().lower()
-        if key in by_phrase:
-            existing = by_phrase[key]
-            for p in row.get("prompts", []):
-                if p not in existing.setdefault("prompts", []):
-                    existing["prompts"].append(p)
-            for s in row.get("sources_to_beat", []):
-                if norm_url(s.get("url")) not in {
-                    norm_url(x.get("url")) for x in existing.get("sources_to_beat", [])
-                }:
-                    existing.setdefault("sources_to_beat", []).append(s)
-        else:
-            row = dict(row)
-            row["num"] = next_num
-            next_num += 1
-            plan.append(row)
-            by_phrase[key] = row
-    merged["content_plan"] = plan
 
     # Off-site targets dedupe by page URL.
     off = {norm_url(t["page_url"]): t for t in merged.get("offsite_targets", [])}
@@ -306,7 +463,15 @@ def merge_runs(state, run):
         thr.setdefault(norm_url(t["url"]), t)
     merged["threads"] = list(thr.values())
 
-    merged["project"] = run.get("project", merged.get("project"))
+    # Totals across every prompt run so far, for the Method tab.
+    def total(k):
+        vals = [h.get(k) for h in history if isinstance(h.get(k), int)]
+        return sum(vals) if vals else None
+    merged["coverage"] = {k: total(k) for k in ("raw_queries", "merged_intents", "searches_run")}
+
+    merged["scope"] = {**run.get("scope", {}),
+                       "prompt_ids": sorted({h.get("prompt_id") for h in history if h.get("prompt_id")})}
+    merged["project"] = run.get("project") or merged.get("project") or {}
     merged["run_date"] = run.get("run_date") or date.today().isoformat()
     return merged
 
@@ -387,7 +552,7 @@ def wrap_body(ws, start=2):
 def sheet_readme(wb, run):
     ws = wb.create_sheet("Read Me")
     scope = run.get("scope", {})
-    project = run.get("project", {})
+    project = run.get("project") or {}
     rows = [
         ("GEO Action Plan", ""),
         ("Project", project.get("name", "")),
@@ -738,12 +903,14 @@ def main():
     with open(args.run_json) as f:
         run = json.load(f)
 
+    errors = validate_coverage(run)
+
     if args.merge:
         with open(args.merge) as f:
             state = json.load(f)
         run = merge_runs(state, run)
 
-    errors = validate(run)
+    errors += validate(run)
     if errors:
         print("VALIDATION FAILED — the plan was not written:\n", file=sys.stderr)
         for e in errors:

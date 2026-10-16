@@ -30,11 +30,11 @@ If a proposed title cannot be traced to one of these, the row does not get creat
 
 - Keep the query's noun phrase, change the frame: evidence `"I tested the 7 best AEO tools"` → `"The 9 AEO tools we tested for a headless CMS stack"`.
 - Convert a question prompt into its statement form: prompt `"What tools help create content that both Google and ChatGPT will surface?"` → `"Tools that get content surfaced by both Google and ChatGPT"`.
-- Add the scope qualifier that distinguishes it from a near-synonym row: `"Best GEO tools"` → `"Best GEO tools for the full content stack (not just monitoring)"`.
+- Add the scope qualifier that distinguishes it from a neighbouring row: `"Best GEO tools"` → `"Best GEO tools for the full content stack (not just monitoring)"`.
 
 Illegal: inventing a phrasing nobody searches ("The modern content velocity playbook"), or drifting to the brand's internal vocabulary when the evidence uses different words.
 
-**Phrasing sensitivity.** Because retrieval is phrasing-sensitive, near-synonym phrasings that retrieve different page sets each get their own row — but only with an explicit scope statement in the row saying what each covers and what it excludes, plus a merge-and-301 fallback if they end up competing. Without the scope statement, they are one row, not two.
+**Phrasing and clusters.** Rows come from content clusters (SKILL.md Step 3), which group pages by what they say, not by how they're phrased. Two phrasings whose pages tell a reader the same thing are one cluster and one row; the title keeps the wording the evidence uses most. Two phrasings whose pages answer different questions are separate clusters and separate rows, each with a guardrail naming what it excludes.
 
 ## The angle
 
@@ -64,8 +64,8 @@ Every angle names **which brand asset it depends on**. If the brand does not hav
 - **Comparisons** — both brand-vs-competitor and neutral third-party X-vs-Y where the brand credibly referees.
 - **One hub page** to concentrate internal links, when the plan has enough rows to warrant it.
 - **Evidence assets follow the ladder** (see the section below). Plan the executable rung alongside the blocked one; never plan only a rung the brand cannot start.
-- **Cover every prompt in scope.** Prompts with weak incumbents are the cheapest wins and usually deserve P0 despite low volume.
-- **UGC never becomes a content row.** It goes to the off-site tab.
+- **Cover every prompt in scope.** Prompts with weak incumbents are the cheapest wins; rank their topics up on winnability (see the priority rubric).
+- **UGC alone never becomes a content row.** A UGC page can join a content cluster as a demand signal when it asks or answers the same thing, but a cluster made only of UGC goes to the Threads and Off-site tabs, not the content plan.
 
 ## The evidence ladder
 
@@ -97,16 +97,17 @@ The two rows are separate rows with hard guardrails, not one row with a caveat. 
 
 ## Priority rubric
 
-Score each candidate on four axes, then assign:
+Score each cluster on five things, then assign a priority. List every cluster; priority orders the list, it never removes a row.
 
-1. **Retrieval volume** for its theme (retrievals from the citation layer, weighted score from the SERP layer).
-2. **Direct prompt match** — does it own a prompt in scope, or only touch it?
-3. **Product fit** — would a citation here plausibly convert, or is it traffic without intent?
-4. **Winnability** — incumbent strength, from the combined-layer analysis.
+1. **Evidence strength** — number of member pages, total retrievals and citations, SERP weight.
+2. **Prompt match** — does the topic answer a tracked prompt in scope directly, or only touch it?
+3. **Product fit** — High (the brand's category and audience), Medium (adjacent, a mention could still sell), Low (outside the category).
+4. **Winnability** — incumbent strength from the combined-layer analysis, and whether the brand already has a page.
+5. **Readiness** — whether the brand has the asset the angle needs.
 
-- **P0** — high on all four, or a prerequisite fix. Target 2–4 for a single-prompt run, 6–10 for a full-project plan. A plan where everything is P0 prioritizes nothing.
-- **P1** — high on three, or high volume with moderate winnability.
-- **P2** — long-tail, or high effort against strong incumbents.
+- **P0** — strong evidence, direct prompt match, High fit, startable now; or a prerequisite fix. A topic for a prompt with thin, weak incumbents also qualifies when the match is direct and the fit is High, because it's the cheapest win available. Usually 10–15% of rows. A plan where everything is P0 prioritizes nothing.
+- **P1** — strong on most of the five, or High fit with moderate evidence.
+- **P2** — everything else, including every Low-fit topic.
 
 ## Cannibalization policy
 
