@@ -1,0 +1,36 @@
+{
+  "name": "personalized-landing-pages",
+  "version": "0.1.0",
+  "description": "Build personalized landing pages in Prismic for target accounts, grounded in CRM and web research, with an offer fit verdict and copy that fits your layout.",
+  "author": {
+    "name": "Prismic",
+    "url": "https://prismic.io"
+  },
+  "repository": "https://github.com/prismicio-community/skills",
+  "license": "MIT",
+  "keywords": [
+    "abm",
+    "personalization",
+    "landing-pages",
+    "prismic",
+    "account-based-marketing"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Personalized Landing Pages",
+    "shortDescription": "Account pages in Prismic",
+    "longDescription": "Build personalized landing pages in Prismic for target accounts, grounded in CRM and web research, with an offer fit verdict and copy that fits your layout.",
+    "developerName": "Prismic",
+    "category": "Productivity",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "logoDark": "./assets/icon.svg",
+    "capabilities": [
+      "Skills"
+    ],
+    "defaultPrompt": [
+      "Build a personalized landing page for acme.com from our Prismic base page.",
+      "Build account pages for these five domains from our ABM base page."
+    ]
+  }
+}
