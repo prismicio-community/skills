@@ -5,5 +5,19 @@
     "name": "Prismic",
     "url": "https://prismic.io"
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "geo-action-plan",
+      "source": "./plugins/geo-action-plan",
+      "strict": false,
+      "description": "Turn your AI visibility tool's data into a ranked plan of pages to create or update, and sites and threads to get mentioned in, so AI assistants cite you.",
+      "author": {
+        "name": "Prismic",
+        "url": "https://prismic.io"
+      },
+      "skills": [
+        "./skills/geo-action-plan"
+      ]
+    }
+  ]
 }
