@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-// Scaffolds a plugin or skill from docs/templates/ and registers it in both marketplaces.
+// Scaffolds a plugin, skill, or prompt from docs/templates/. Plugins and skills
+// are also registered in both marketplaces.
 //   npm run new:plugin -- <plugin> <first-skill>
 //   npm run new:skill -- <plugin> <skill>
+//   npm run new:prompt -- <prompt>
 // The new files contain "[[fill in: ...]]" placeholders, which "npm run validate"
 // reports until they are replaced.
 import fs from 'node:fs';
@@ -9,10 +11,11 @@ import path from 'node:path';
 import { PATHS, abs, exists, readText, readJson, loadPlugins, loadConfig, contextPath } from './lib/repo.mjs';
 
 const NAME_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const [kind, plugin, skill] = process.argv.slice(2);
+const [kind, ...names] = process.argv.slice(2);
+const [plugin, skill] = names;
 
 const usage = () => {
-  console.error('Usage:\n  npm run new:plugin -- <plugin> <first-skill>\n  npm run new:skill -- <plugin> <skill>');
+  console.error('Usage:\n  npm run new:plugin -- <plugin> <first-skill>\n  npm run new:skill -- <plugin> <skill>\n  npm run new:prompt -- <prompt>');
   process.exit(1);
 };
 const die = (msg) => {
@@ -20,14 +23,10 @@ const die = (msg) => {
   process.exit(1);
 };
 
-if (!['plugin', 'skill'].includes(kind) || !plugin || !skill) usage();
-for (const n of [plugin, skill]) {
+if (names.length !== { plugin: 2, skill: 2, prompt: 1 }[kind]) usage();
+for (const n of names) {
   if (!NAME_RE.test(n) || n.length > 64) die(`"${n}" must be lowercase letters, numbers, and hyphens, such as "meta-descriptions".`);
 }
-
-const plugins = loadPlugins();
-const owner = plugins.flatMap((p) => p.skills).find((s) => s.name === skill);
-if (owner) die(`A skill named "${skill}" already exists in plugins/${owner.plugin}. Skill names must be unique.`);
 
 const title = (n) => n.split('-').map((w) => w[0].toUpperCase() + w.slice(1)).join(' ');
 const fill = (template, vars) => readText(`docs/templates/${template}`).replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k]);
@@ -38,6 +37,21 @@ const write = (rel, content) => {
   created.push(rel);
 };
 const writeJson = (rel, data) => fs.writeFileSync(abs(rel), `${JSON.stringify(data, null, 2)}\n`);
+const next = () => console.log('\nNext: replace every "[[fill in: ...]]" placeholder, then run "npm run validate".');
+
+// A prompt is one Markdown file and its page. It isn't listed in a marketplace.
+if (kind === 'prompt') {
+  const [prompt] = names;
+  if (exists(`${PATHS.prompts}/${prompt}.md`)) die(`${PATHS.prompts}/${prompt}.md already exists. Prompt names must be unique.`);
+  write(`${PATHS.prompts}/${prompt}.md`, readText('docs/templates/prompt.template.md'));
+  write(contextPath.prompt(prompt), fill('prompt-page.template.md', { prompt, title: title(prompt) }));
+  console.log(`Created:\n${created.map((f) => `  ${f}`).join('\n')}`);
+  next();
+  process.exit(0);
+}
+
+const owner = loadPlugins().flatMap((p) => p.skills).find((s) => s.name === skill);
+if (owner) die(`A skill named "${skill}" already exists in plugins/${owner.plugin}. Skill names must be unique.`);
 
 const claude = readJson(PATHS.claudeMarketplace);
 const codex = readJson(PATHS.codexMarketplace);
@@ -95,4 +109,4 @@ writeJson(PATHS.claudeMarketplace, claude);
 writeJson(PATHS.codexMarketplace, codex);
 
 console.log(`Created:\n${created.map((f) => `  ${f}`).join('\n')}\nUpdated:\n  ${PATHS.claudeMarketplace}${kind === 'plugin' ? `\n  ${PATHS.codexMarketplace}` : ''}`);
-console.log('\nNext: replace every "[[fill in: ...]]" placeholder, then run "npm run validate".');
+next();

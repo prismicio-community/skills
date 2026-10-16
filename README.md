@@ -1,9 +1,10 @@
 # Prismic AI library
 
-Free plugins and skills from Prismic for Claude, ChatGPT, and other AI assistants. Browse them in the library on the Prismic website, or install them straight from this repository. <!-- TODO: link the library page once it is live. -->
+Free plugins, skills, and prompts from Prismic for Claude, ChatGPT, and other AI assistants. Browse them in the library on the Prismic website, or install them straight from this repository. <!-- TODO: link the library page once it is live. -->
 
 - A **skill** is a folder of instructions and supporting files that teaches an assistant one workflow, such as writing meta descriptions.
 - A **plugin** bundles one or more related skills so you can install them together.
+- A **prompt** is a single message you copy and paste into a chat, such as one that builds a dashboard. There's nothing to install. Copy it from the library page or from [`prompts/`](prompts/).
 
 > [!NOTE]
 > **Building a Prismic project?** Use the official Prismic skill in [prismicio/skills](https://github.com/prismicio/skills) instead. The Prismic documentation recommends it, and it helps your assistant work with content models, slices, and content. The skills here are for general website and content work, such as SEO.
@@ -57,12 +58,13 @@ Add `--global` to install for your user instead of the current project, and `--a
 
 ### Download the files
 
-Every skill and plugin is available as a file on the [library downloads release](https://github.com/prismicio-community/skills/releases/tag/library). The library page links to the same files.
+Every skill, plugin, and prompt is available as a file on the [library downloads release](https://github.com/prismicio-community/skills/releases/tag/library). The library page links to the same files.
 
 | File | What to do with it |
 | --- | --- |
 | `<skill>.zip` | **Claude:** go to **Customize → Skills**, select **+**, then **Upload a skill**. Don't rename the zip or the folder inside it. **Claude Code:** unzip it into `~/.claude/skills/`. **Codex:** unzip it into `~/.agents/skills/`. |
 | `<plugin>.plugin` | **Claude:** go to **Customize → Plugins**, select **Add**, then **Upload plugin**. |
+| `<prompt>.md` | Open it, copy everything, and paste it into a new chat. |
 
 ## Update
 
@@ -74,12 +76,13 @@ Every skill and plugin is available as a file on the [library downloads release]
 | Marketplace in Codex | Run `codex plugin marketplace upgrade prismic-community`. If a plugin doesn't change, run `codex plugin add <plugin>@prismic-community` again. |
 | skills CLI | Run `npx skills update`. |
 | Downloaded file | Download the file again and upload or unzip it in place of the old one. |
+| Prompt | Copy the prompt again. Anything it already built keeps working as it is. |
 
 Updates ship as soon as they are merged. There are no version numbers to track.
 
 ## Contribute
 
-To suggest a change or add a skill, see [CONTRIBUTING.md](CONTRIBUTING.md).
+To suggest a change or add a skill or prompt, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
