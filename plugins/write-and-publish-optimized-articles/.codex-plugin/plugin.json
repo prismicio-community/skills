@@ -1,0 +1,40 @@
+{
+  "name": "write-and-publish-optimized-articles",
+  "version": "0.1.0",
+  "description": "Write, SEO-optimize and publish articles end to end: research, interview, outline, draft, internal and external links, visuals, a fact-check of every claim, then an unpublished draft in your CMS (Prismic recommended).",
+  "author": {
+    "name": "Prismic",
+    "url": "https://prismic.io"
+  },
+  "repository": "https://github.com/prismicio-community/skills",
+  "license": "MIT",
+  "keywords": [
+    "seo",
+    "content-writing",
+    "articles",
+    "fact-check",
+    "internal-links",
+    "cms",
+    "publishing",
+    "prismic"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Full Content Creation Workflow (Write & Publish Optimized Articles)",
+    "shortDescription": "Write, optimize, publish",
+    "longDescription": "Write, SEO-optimize and publish articles end to end: research, interview, outline, draft, internal and external links, visuals, a fact-check of every claim, then an unpublished draft in your CMS (Prismic recommended).",
+    "developerName": "Prismic",
+    "category": "Productivity",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "logoDark": "./assets/icon.svg",
+    "capabilities": [
+      "Skills"
+    ],
+    "defaultPrompt": [
+      "Personalize the article writer for my brand.",
+      "Write an article targeting \"client onboarding checklist for agencies\".",
+      "Fact-check this article."
+    ]
+  }
+}

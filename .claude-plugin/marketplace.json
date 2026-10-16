@@ -18,6 +18,26 @@
       "skills": [
         "./skills/geo-action-plan"
       ]
+    },
+    {
+      "name": "write-and-publish-optimized-articles",
+      "source": "./plugins/write-and-publish-optimized-articles",
+      "strict": false,
+      "description": "Write, SEO-optimize and publish articles end to end: research, interview, outline, draft, internal and external links, visuals, a fact-check of every claim, then an unpublished draft in your CMS (Prismic recommended).",
+      "author": {
+        "name": "Prismic",
+        "url": "https://prismic.io"
+      },
+      "skills": [
+        "./skills/write-rich-article",
+        "./skills/fact-check-article",
+        "./skills/add-external-links",
+        "./skills/add-internal-links",
+        "./skills/plan-article-visuals",
+        "./skills/create-cms-draft",
+        "./skills/link-old-posts-to-new-article",
+        "./skills/personalize-article-writer"
+      ]
     }
   ]
 }
