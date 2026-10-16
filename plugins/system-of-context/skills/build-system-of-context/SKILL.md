@@ -41,7 +41,7 @@ Ask for whatever is missing, in one batch:
   another document tool the user has connected.
 
 If a System of Context already exists for this company, do not rebuild it.
-Use the context-refresh skill to add sources or close gaps, unless the user
+Use the system-of-context-refresh skill to add sources or close gaps, unless the user
 asks for a clean start.
 
 ## Phase 1: Harvest
@@ -129,8 +129,8 @@ the assistant has memory, record where the System of Context lives.
 
 Tell the user, in plain language: where it is saved, the gaps that matter
 most and who could close them, and that the system-of-context skill now loads
-it automatically, the claim-check skill audits drafts against it, and the
-context-refresh skill should run monthly.
+it automatically, the system-of-context-claim-check skill audits drafts against it, and the
+system-of-context-refresh skill should run monthly.
 
 ## Compatibility
 

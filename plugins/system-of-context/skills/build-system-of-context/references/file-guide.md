@@ -143,7 +143,7 @@ are earned, not compiled.
 
 ## Sources
 
-One row per page. The context-refresh skill depends on it.
+One row per page. The system-of-context-refresh skill depends on it.
 
 ```
 | File | Source | Type | URL or location | Last read | Owner |

@@ -1,8 +1,8 @@
 # Sources
 
-**Status:** Maintained by the context-refresh skill. Snapshot taken {{DATE}}.
+**Status:** Maintained by the system-of-context-refresh skill. Snapshot taken {{DATE}}.
 
-The upstream source for every page. The context-refresh skill reads this table
+The upstream source for every page. The system-of-context-refresh skill reads this table
 to know where to look and how to check freshness. Keep it accurate: a wrong
 row means a page that never refreshes.
 

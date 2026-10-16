@@ -57,7 +57,7 @@ is unfalsifiable and useless. "Account page openers naming the account's
 current tool got replies from 7 of 20 accounts, versus 1 of 20 for generic
 openers" can be tested again.
 
-Add, confirm and retire entries through the context-refresh skill.
+Add, confirm and retire entries through the system-of-context-refresh skill.
 
 ---
 

@@ -25,8 +25,8 @@ This plugin installs four skills:
 
 - **Build System of Context** (`build-system-of-context`) researches your website and internal docs, interviews you for what no website says, and saves thirteen pages as documents you own.
 - **System of Context** (`system-of-context`) finds those documents and loads the right pages whenever an assistant writes or reviews something about your company.
-- **Claim Check** (`claim-check`) audits a draft before it ships and proposes a paste-ready fix for every problem.
-- **Context Refresh** (`context-refresh`) checks each page against its source, proposes a reviewed update, and keeps a log of what changed.
+- **Claim Check** (`system-of-context-claim-check`) audits a draft before it ships and proposes a paste-ready fix for every problem.
+- **Context Refresh** (`system-of-context-refresh`) checks each page against its source, proposes a reviewed update, and keeps a log of what changed.
 
 Pairs well with **Personalized Landing Pages**, which reads your offers, voice and proof from your System of Context.
 

@@ -77,8 +77,8 @@
       "skills": [
         "./skills/system-of-context",
         "./skills/build-system-of-context",
-        "./skills/claim-check",
-        "./skills/context-refresh"
+        "./skills/system-of-context-claim-check",
+        "./skills/system-of-context-refresh"
       ]
     }
   ]

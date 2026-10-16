@@ -1,6 +1,6 @@
 ---
-name: claim-check
-description: "Audit a draft against the company's System of Context before it ships: find invented, drifted or unsupported claims, overclaimed capabilities, restricted evidence, off-limits topics and banned words, and propose a paste-ready fix for each. Use on landing pages, campaign copy, posts, decks, emails and agent-written pages, or when someone asks \"can we say this\", \"is this accurate\" or \"check this before I send it\"."
+name: system-of-context-claim-check
+description: "Audit a draft against the company's System of Context before it ships: find invented, drifted or unsupported claims, overclaims, restricted evidence, off-limits topics and banned words, with a paste-ready fix for each. Use on any external copy, agent-written pages included, or when someone asks \"can we say this\", \"is this accurate\" or \"check this before I send it\". To fact-check an SEO article against outside sources, use fact-check-seo-article."
 ---
 
 # Claim check

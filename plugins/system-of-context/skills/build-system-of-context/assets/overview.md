@@ -39,7 +39,7 @@ or quote goes into external-facing work.
 
 **Compiled**: every page except **Learnings**. Compiled from {{COMPANY}}'s
 sources, owned upstream by {{UPSTREAM_OWNER}}. Read-only during a task.
-Changed only through the context-refresh skill, which proposes a diff for
+Changed only through the system-of-context-refresh skill, which proposes a diff for
 human approval.
 
 **Learned**: the **Learnings** page only. {{LEARNINGS_OWNER}}'s own findings

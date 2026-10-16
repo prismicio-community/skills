@@ -1,5 +1,5 @@
 ---
-name: context-refresh
+name: system-of-context-refresh
 description: "Keep a System of Context current: check each page against its upstream source, propose a reviewed diff, apply approved changes in the documents, and add, confirm or retire learnings. Use monthly, when the context feels out of date, when someone asks when it was last refreshed, when a page contradicts its source, to add a new source, before a high-stakes deliverable, or to record a new learning."
 ---
 

@@ -60,7 +60,7 @@ in the task, because this skill is loaded by unattended runs that publish.
 ## Two kinds of truth
 
 - **Compiled** pages come from the company's own sources and owners. Do not
-  edit them mid-task. Changes go through the context-refresh skill as a
+  edit them mid-task. Changes go through the system-of-context-refresh skill as a
   reviewed diff.
 - **Learnings** are the team's own findings, each marked provisional,
   confirmed or retired. They are weaker evidence than a compiled fact. Say so
@@ -79,7 +79,7 @@ than guessing past it.
 
 ## Before anything ships
 
-Run the claim-check skill on finished external content.
+Run the system-of-context-claim-check skill on finished external content.
 
 ## Compatibility
 
