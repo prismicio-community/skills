@@ -1,9 +1,10 @@
 # Prismic AI library
 
-Free plugins and skills from Prismic for Claude, ChatGPT, and other AI assistants. Browse them in the library on the Prismic website, or install them straight from this repository. <!-- TODO: link the library page once it is live. -->
+Free plugins, skills, and prompts from Prismic for Claude, ChatGPT, and other AI assistants. Browse them in the library on the Prismic website, or install them straight from this repository. <!-- TODO: link the library page once it is live. -->
 
 - A **skill** is a folder of instructions and supporting files that teaches an assistant one workflow, such as writing meta descriptions.
 - A **plugin** bundles one or more related skills so you can install them together.
+- A **prompt** is a single message you copy and paste into a chat, such as one that builds a dashboard. There's nothing to install. Copy it from the library page or from [`prompts/`](prompts/).
 
 > [!NOTE]
 > **Looking for the official Prismic skill?** It lives in [prismicio/skills](https://github.com/prismicio/skills), and it's the one the Prismic documentation recommends. It helps an assistant build and manage Prismic projects: content models, slices, and content, through the Prismic CLI and MCP server.
@@ -59,12 +60,13 @@ Add `--global` to install for your user instead of the current project, and `--a
 
 ### Download the files
 
-Every skill and plugin is available as a file on the [library downloads release](https://github.com/prismicio-community/skills/releases/tag/library). The library page links to the same files.
+Every skill, plugin, and prompt is available as a file on the [library downloads release](https://github.com/prismicio-community/skills/releases/tag/library). The library page links to the same files.
 
 | File | What to do with it |
 | --- | --- |
 | `<skill>.zip` | **Claude:** go to **Customize → Skills**, select **+**, then **Upload a skill**. Don't rename the zip or the folder inside it. **Claude Code:** unzip it into `~/.claude/skills/`. **Codex:** unzip it into `~/.agents/skills/`. |
 | `<plugin>.plugin` | **Claude:** go to **Customize → Plugins**, select **Add**, then **Upload plugin**. |
+| `<prompt>.md` | Open it, copy everything, and paste it into a new chat. |
 
 ## Update
 
@@ -76,6 +78,7 @@ Every skill and plugin is available as a file on the [library downloads release]
 | Marketplace in Codex | Run `codex plugin marketplace upgrade prismic-community`. If a plugin doesn't change, run `codex plugin add <plugin>@prismic-community` again. |
 | skills CLI | Run `npx skills update`. |
 | Downloaded file | Download the file again and upload or unzip it in place of the old one. |
+| Prompt | Copy the prompt again. Anything it already built keeps working as it is. |
 
 Every change merged into `main` is a new release. There are no version numbers to track.
 
@@ -90,19 +93,21 @@ plugins/<plugin>/                   One installable plugin
   skills/<skill>/                   One installable skill
     SKILL.md                        Instructions the assistant follows
     references/, assets/, scripts/  Files the skill uses while it works
+prompts/<prompt>.md                 One prompt, copied and pasted as written
 library-context/                    Library page content (not installed)
   taxonomy.yml                      Allowed categories and platforms
   plugins/<plugin>/index.md         Plugin page
   plugins/<plugin>/skills/<skill>/index.md   Skill page
+  prompts/<prompt>/index.md         Prompt page
 docs/                               Templates and the website data format
 scripts/                            Validation and packaging
 ```
 
-Plugins and skills contain only what an assistant needs. Text and images for the library page live in `library-context/`, which mirrors the `plugins/` folder and is never installed.
+Plugins, skills, and prompts contain only what an assistant needs. Text and images for the library page live in `library-context/`, which mirrors the `plugins/` and `prompts/` folders and is never installed.
 
 ## Contribute
 
-Anyone at Prismic can add or update a plugin, skill, or library page through a pull request, including from the GitHub website without installing anything. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Anyone at Prismic can add or update a plugin, skill, prompt, or library page through a pull request, including from the GitHub website without installing anything. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Maintainers and coding agents: see [AGENTS.md](AGENTS.md) for the repository rules and [docs/website-integration.md](docs/website-integration.md) for the data the library page uses.
 

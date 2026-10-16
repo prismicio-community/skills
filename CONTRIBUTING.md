@@ -1,18 +1,19 @@
 # Contributing
 
-You can add or update plugins, skills, and library pages through a pull request. Everything on this page works in the GitHub website, so you don't need to install anything.
+You can add or update plugins, skills, prompts, and library pages through a pull request. Everything on this page works in the GitHub website, so you don't need to install anything.
 
 ## Where things live
 
 | You want to change | Edit this | Who sees it |
 | --- | --- | --- |
-| Text or images on the library page | `library-context/plugins/<plugin>/index.md` or `library-context/plugins/<plugin>/skills/<skill>/index.md` | Website visitors |
+| Text or images on the library page | `library-context/plugins/<plugin>/index.md`, `library-context/plugins/<plugin>/skills/<skill>/index.md`, or `library-context/prompts/<prompt>/index.md` | Website visitors |
 | What a skill tells the assistant to do | `plugins/<plugin>/skills/<skill>/SKILL.md` and the files next to it | Everyone who installs the skill |
+| The text of a prompt | `prompts/<prompt>.md` | Everyone who copies the prompt |
 | A plugin's name and description in Claude or ChatGPT | `.claude-plugin/marketplace.json` and `plugins/<plugin>/.codex-plugin/plugin.json` | Everyone who browses the marketplace |
 | Which categories the website can filter by | `library-context/taxonomy.yml` | Website visitors |
 
 The two halves never mix:
-- `plugins/` holds only what an assistant needs to do the work.
+- `plugins/` and `prompts/` hold only what an assistant needs to do the work.
 - `library-context/` holds only what the website shows.
 
 If a skill needs a template or a reference document while it works, that file goes inside the skill folder. If the website needs a screenshot, that image goes in `library-context/`.
@@ -97,6 +98,28 @@ Skill names use lowercase letters, numbers, and hyphens, such as `meta-descripti
 - **Name connectors by what they are.** Write "a Google Search Console connector", not a tool id from one assistant.
 - **Don't mention plugins inside a skill.** Plugins are how skills are distributed. To point to another skill, use its name.
 - **Keep it public.** No customer names, internal links, credentials, or internal-only process.
+
+## Add a new prompt
+
+A prompt is a single message that visitors copy and paste into a chat, such as one that builds a dashboard. Use a prompt when someone runs the work once. Use a skill when the assistant should do the work again and again.
+
+A prompt needs two files. A maintainer or a coding agent can create both with:
+
+```
+npm run new:prompt -- <prompt-name>
+```
+
+To do it in the GitHub website instead:
+
+1. **Create the prompt.** Create `prompts/<prompt-name>.md` and paste the prompt into it, exactly as visitors should copy it. Don't add `---` fields at the top: the whole file is what the Copy button copies.
+2. **Create the page.** Create `library-context/prompts/<prompt-name>/index.md` and fill it from [docs/templates/prompt-page.template.md](docs/templates/prompt-page.template.md).
+   - Set `platforms` to the assistants the prompt works in, such as `[claude]`. It's required for prompts.
+   - Use `badge` for what the prompt makes, such as `Dashboard`.
+   - Use `examples` for follow-up prompts that change the result.
+   - Don't repeat the prompt on the page. The website shows it from the prompt file.
+3. Fill in the placeholders, commit both files to one branch, and open a pull request.
+
+Prompt names follow the same rules as skill names, such as `content-intelligence-dashboard`. Before you ask for a review, paste the prompt into a new chat and check that it works.
 
 ## Add a new plugin
 

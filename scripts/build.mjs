@@ -2,6 +2,7 @@
 // Builds the downloads and the website index into dist/:
 //   dist/skills/<skill>.zip       one skill folder, ready to upload to Claude
 //   dist/plugins/<plugin>.plugin  one plugin folder with a generated .claude-plugin/plugin.json
+//   dist/prompts/<prompt>.md      one prompt, byte for byte
 //   dist/library.json             everything the library page needs
 // Run with: npm run build
 import fs from 'node:fs';
@@ -37,6 +38,7 @@ export function build() {
   fs.rmSync(abs(PATHS.dist), { recursive: true, force: true });
   fs.mkdirSync(abs(`${PATHS.dist}/skills`), { recursive: true });
   fs.mkdirSync(abs(`${PATHS.dist}/plugins`), { recursive: true });
+  fs.mkdirSync(abs(`${PATHS.dist}/prompts`), { recursive: true });
 
   const pluginInstall = (p) => ({
     claudeCode: [`/plugin marketplace add ${config.repository}`, `/plugin install ${p}@${marketplace}`],
@@ -100,6 +102,21 @@ export function build() {
     }
   }
 
+  // Prompts have nothing to install. Visitors copy the text or download the file.
+  for (const prompt of result.prompts) {
+    const n = prompt.name;
+    const bytes = fs.readFileSync(abs(prompt.file));
+    items.push({
+      ...page(contextPath.prompt(n), rawBase),
+      id: `prompt:${n}`,
+      type: 'prompt',
+      slug: n,
+      prompt: { file: `${n}.md`, markdown: bytes.toString('utf8').replace(/^\uFEFF/, '') },
+      paths: { source: prompt.file, context: contextPath.prompt(n) },
+      download: writeFile(`prompts/${n}.md`, bytes, downloadBase),
+    });
+  }
+
   const library = {
     schemaVersion: SCHEMA_VERSION,
     commit,
@@ -150,7 +167,10 @@ function page(file, rawBase) {
 }
 
 function writeArchive(rel, entries, downloadBase) {
-  const bytes = createZip(entries);
+  return { ...writeFile(rel, createZip(entries), downloadBase), contents: entries.map((e) => e.path).sort() };
+}
+
+function writeFile(rel, bytes, downloadBase) {
   fs.writeFileSync(abs(`${PATHS.dist}/${rel}`), bytes);
   const file = path.posix.basename(rel);
   return {
@@ -158,7 +178,6 @@ function writeArchive(rel, entries, downloadBase) {
     url: `${downloadBase}/${file}`,
     bytes: bytes.length,
     sha256: crypto.createHash('sha256').update(bytes).digest('hex'),
-    contents: entries.map((e) => e.path).sort(),
   };
 }
 

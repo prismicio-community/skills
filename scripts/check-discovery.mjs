@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Checks the repo with the real tools users install from:
-//   1. skills CLI: lists every skill, and installs one with its exact files.
+//   1. skills CLI: lists every skill and no prompt, and installs one skill with its exact files.
 //   2. Claude Code: validates the marketplace and each .plugin download,
 //      then adds the marketplace and installs every plugin.
 //   3. Codex: adds the marketplace and installs every plugin.
@@ -12,7 +12,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { ROOT, PATHS, abs, exists, readJson, walkFiles, loadPlugins } from './lib/repo.mjs';
+import { ROOT, PATHS, abs, exists, readJson, walkFiles, loadPlugins, loadPrompts } from './lib/repo.mjs';
 import { readZip } from './lib/zip.mjs';
 
 const SKILLS_CLI = 'skills@1.7.2';
@@ -22,6 +22,7 @@ const record = (status, name, detail = '') => results.push({ status, name, detai
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'library-discovery-'));
 const plugins = loadPlugins();
 const skills = plugins.flatMap((p) => p.skills);
+const prompts = loadPrompts().filter((p) => p.isPrompt);
 const marketplace = readJson(PATHS.claudeMarketplace).name;
 
 function run(cmd, args, { env = {}, cwd = tmp } = {}) {
@@ -45,9 +46,13 @@ else {
   const list = run('npx', ['-y', SKILLS_CLI, 'add', ROOT, '--list'], { env: { HOME: home } });
   if (!list.ok) record('FAIL', 'skills CLI --list', tail(list.out));
   else {
-    const missing = skills.filter((s) => !new RegExp(`^[\\s│]*${s.name}\\s*$`, 'm').test(list.out));
+    const listed = (name) => new RegExp(`^[\\s│]*${name}\\s*$`, 'm').test(list.out);
+    const missing = skills.filter((s) => !listed(s.name));
+    // Prompts are copied, not installed, so the skills CLI must not offer them.
+    const leaked = prompts.filter((p) => listed(p.name) && !skills.some((s) => s.name === p.name));
     const count = Number(list.out.match(/Found (\d+) skill/)?.[1]);
     if (missing.length) record('FAIL', 'skills CLI --list', `not listed: ${missing.map((s) => s.name).join(', ')}`);
+    else if (leaked.length) record('FAIL', 'skills CLI --list', `prompts listed as skills: ${leaked.map((p) => p.name).join(', ')}`);
     else if (count !== skills.length) record('FAIL', 'skills CLI --list', `found ${count}, expected ${skills.length}`);
     else record('PASS', 'skills CLI --list', `${count} skill(s) found`);
   }

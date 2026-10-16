@@ -6,6 +6,7 @@ The library page on the Prismic website reads one file: `library.json`. Every pu
 https://github.com/prismicio-community/skills/releases/download/library/library.json
 https://github.com/prismicio-community/skills/releases/download/library/<skill>.zip
 https://github.com/prismicio-community/skills/releases/download/library/<plugin>.plugin
+https://github.com/prismicio-community/skills/releases/download/library/<prompt>.md
 ```
 
 These URLs never change. Fetch `library.json` when the website builds, not from the browser. GitHub release downloads redirect and don't send CORS headers.
@@ -33,19 +34,19 @@ To build the same file locally, run `npm run build`. It writes to `dist/library.
     "categories": [{ "id": "seo", "label": "SEO and AI search" }],
     "platforms": [{ "id": "claude", "label": "Claude apps" }]
   },
-  "items": [ /* one per plugin and one per skill, see below */ ]
+  "items": [ /* one per plugin, skill, and prompt, see below */ ]
 }
 ```
 
 ### Items
 
-Plugins and skills share most fields:
+Plugins, skills, and prompts share most fields:
 
 | Field | Type | Notes |
 | --- | --- | --- |
-| `id` | string | `plugin:<name>` or `skill:<name>`. Unique. |
-| `type` | `"plugin"` or `"skill"` | |
-| `slug` | string | Plugin or skill name. Unique within each type. A plugin and a skill can share a slug. |
+| `id` | string | `plugin:<name>`, `skill:<name>`, or `prompt:<name>`. Unique. |
+| `type` | `"plugin"`, `"skill"`, or `"prompt"` | |
+| `slug` | string | Plugin, skill, or prompt name. Unique within each type. Items of different types can share a slug. |
 | `title`, `summary`, `description` | string | From the page fields |
 | `categories`, `tags`, `platforms` | string[] | Category and platform ids are listed in `taxonomy` |
 | `featured`, `draft` | boolean | **Don't list items where `draft` is `true`.** |
@@ -56,7 +57,7 @@ Plugins and skills share most fields:
 | `intro` | string | Markdown before the first section, often empty |
 | `sections` | `{ id, heading, markdown }[]` | One per `## ` heading, in page order. Always includes `how-it-works` and `setup`. Relative links and images are rewritten to absolute URLs. |
 | `paths.source`, `paths.context` | string | Repository paths of the package and its page |
-| `download` | object | `file`, `url`, `bytes`, `sha256`, and `contents` (paths inside the archive) |
+| `download` | object | `file`, `url`, `bytes`, and `sha256`. Plugins and skills also have `contents` (paths inside the archive). |
 
 Plugin-only fields:
 
@@ -75,6 +76,15 @@ Skill-only fields:
 | `install.skillsCli` | `npx skills add prismicio-community/skills --skill <name>` |
 | `install.viaPlugin` | The containing plugin's `install` object |
 
+Prompt-only fields:
+
+| Field | Notes |
+| --- | --- |
+| `prompt.file` | File name to show next to the Copy button, such as `content-intelligence-dashboard.md` |
+| `prompt.markdown` | The full prompt, exactly as the Copy button should copy it |
+
+Prompts have no `install` field. Visitors copy `prompt.markdown`, or download the same text from `download.url`.
+
 `schemaVersion` changes only when a field is removed or changes meaning. Fields may be added at any time.
 
 ## Suggested page mapping
@@ -84,11 +94,12 @@ Skill-only fields:
 | Card title, text, badge | `title`, `summary`, `badge` |
 | Card requirement chips | `requirements` where `required` is `true` |
 | Card output line | `output` |
-| Type filter | `type` |
+| Type filter | `type`. For prompts, `badge` says what the prompt makes, such as "Dashboard". |
 | Category filter | `categories`, labels from `taxonomy.categories` |
 | Search | `title`, `summary`, `tags`, `requirements[].name`, section text |
 | Detail tabs | `sections` |
 | Copyable prompts | `examples` |
+| Prompt tab with a Copy button | `prompt.file`, `prompt.markdown` (prompts only) |
 | Download button | `download.url` |
-| Install tab | `install`, plus the generic steps in the repository README |
+| Install tab | `install`, plus the generic steps in the repository README. Prompts have none. |
 | Meta description | `description` |

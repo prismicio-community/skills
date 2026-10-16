@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Checks the marketplaces, plugins, skills, and library-context pages.
+// Checks the marketplaces, plugins, skills, prompts, and library-context pages.
 // Run with: npm run validate
 import fs from 'node:fs';
 import path from 'node:path';
@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 import { parse as parseYaml } from 'yaml';
 import {
   PATHS, abs, exists, readText, readJson, listDirs, walk, hasExactFile, parseFrontmatter,
-  splitSections, relativeLinks, loadPlugins, contextPath,
+  splitSections, relativeLinks, loadPlugins, loadPrompts, contextPath,
 } from './lib/repo.mjs';
 
 const NAME_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -182,10 +182,15 @@ export function validate() {
     }
   }
 
-  // ---------------------------------------------------------------- library-context
-  validateContext(plugins, { error, warn });
+  // ---------------------------------------------------------------- prompts
+  const entries = loadPrompts();
+  for (const prompt of entries) validatePrompt(prompt, { error, warn });
+  const prompts = entries.filter((p) => p.isPrompt);
 
-  return { errors, warnings, plugins };
+  // ---------------------------------------------------------------- library-context
+  validateContext(plugins, prompts, { error, warn });
+
+  return { errors, warnings, plugins, prompts };
 }
 
 function validateSkill(skill, { error, warn }) {
@@ -226,7 +231,25 @@ function validateSkill(skill, { error, warn }) {
   if (exists(`${skill.dir}/README.md`)) warn(`${skill.dir}/README.md`, 'Skills do not need a README. Put agent instructions in SKILL.md and website text in library-context/.');
 }
 
-function validateContext(plugins, { error, warn }) {
+// A prompt is one Markdown file that visitors copy and paste exactly as written.
+function validatePrompt(prompt, { error, warn }) {
+  const f = prompt.file;
+  if (!prompt.isPrompt) {
+    return error(f, 'Unexpected item. Each prompt is one Markdown file, prompts/<prompt>.md. Images for its page go in library-context/prompts/<prompt>/assets/.');
+  }
+  if (!NAME_RE.test(prompt.name) || prompt.name.length > 64) {
+    error(f, `"${prompt.entry}" must be lowercase letters, numbers, and hyphens, followed by .md, such as "content-dashboard.md" (max 64 before .md).`);
+  }
+  const text = readText(f);
+  if (!text.trim()) return error(f, 'The prompt is empty.');
+  if (/^---\r?\n/.test(text)) {
+    error(f, `Remove the frontmatter. Visitors copy this file exactly as written, so it holds only the prompt. Card and page fields go in ${contextPath.prompt(prompt.name)}.`);
+  }
+  if (text.includes(PLACEHOLDER)) error(f, `Replace every "${PLACEHOLDER}: ...]]" placeholder with real text.`);
+  if (/mcp__/.test(text)) warn(f, 'Name connector capabilities ("a Notion connector"), not tool ids like mcp__...');
+}
+
+function validateContext(plugins, prompts, { error, warn }) {
   const ctx = PATHS.context;
   let taxonomy = null;
   if (!exists(PATHS.taxonomy)) error(PATHS.taxonomy, 'Missing.');
@@ -245,14 +268,15 @@ function validateContext(plugins, { error, warn }) {
   const categoryIds = (taxonomy?.categories ?? []).map((c) => c.id);
   const platformIds = (taxonomy?.platforms ?? []).map((c) => c.id);
 
-  // Every plugin and skill has a page.
-  const expectedPages = new Set();
+  // Every plugin, skill, and prompt has a page. The value is the kind of page.
+  const expectedPages = new Map();
   for (const p of plugins) {
-    expectedPages.add(contextPath.plugin(p.name));
-    for (const s of p.skills) expectedPages.add(contextPath.skill(p.name, s.name));
+    expectedPages.set(contextPath.plugin(p.name), 'plugin');
+    for (const s of p.skills) expectedPages.set(contextPath.skill(p.name, s.name), 'skill');
   }
+  for (const p of prompts) expectedPages.set(contextPath.prompt(p.name), 'prompt');
 
-  // Only pages and their assets live here, in the same shape as plugins/.
+  // Only pages and their assets live here, in the same shape as plugins/ and prompts/.
   const allowed = [
     /^README\.md$/,
     /^taxonomy\.yml$/,
@@ -260,6 +284,8 @@ function validateContext(plugins, { error, warn }) {
     /^plugins\/[^/]+\/assets\/.+$/,
     /^plugins\/[^/]+\/skills\/[^/]+\/index\.md$/,
     /^plugins\/[^/]+\/skills\/[^/]+\/assets\/.+$/,
+    /^prompts\/[^/]+\/index\.md$/,
+    /^prompts\/[^/]+\/assets\/.+$/,
   ];
   for (const e of walk(ctx)) {
     const f = `${ctx}/${e.path}`;
@@ -270,17 +296,19 @@ function validateContext(plugins, { error, warn }) {
       continue;
     }
     if (!allowed.some((re) => re.test(e.path))) {
-      error(f, 'Unexpected file. Pages are plugins/<plugin>/index.md or plugins/<plugin>/skills/<skill>/index.md, and images go in an assets/ folder next to the page.');
+      error(f, 'Unexpected file. Pages are plugins/<plugin>/index.md, plugins/<plugin>/skills/<skill>/index.md, or prompts/<prompt>/index.md, and images go in an assets/ folder next to the page.');
       continue;
     }
     if (e.path.endsWith('/index.md') && !expectedPages.has(f)) {
-      error(f, 'This page has no matching plugin or skill in plugins/. Check the folder names, or remove the page.');
+      error(f, e.path.startsWith('prompts/')
+        ? 'This page has no matching prompt. Add prompts/<prompt>.md with the same name as the folder, or remove the page.'
+        : 'This page has no matching plugin or skill in plugins/. Check the folder names, or remove the page.');
     }
     if (e.path.includes('/assets/') && fs.statSync(abs(f)).size > 2 * MB) warn(f, 'Image is over 2 MB. Compress it before adding it.');
   }
 
   const titles = new Map();
-  for (const page of expectedPages) {
+  for (const [page, kind] of expectedPages) {
     if (!exists(page)) {
       error(page, 'Missing website page. Copy one from docs/templates/ and fill it in.');
       continue;
@@ -292,7 +320,7 @@ function validateContext(plugins, { error, warn }) {
       error(page, `Frontmatter problem: ${fmError}.`);
       continue;
     }
-    validatePage(page, data, body, { categoryIds, platformIds, error, warn });
+    validatePage(page, kind, data, body, { categoryIds, platformIds, error, warn });
     if (typeof data.title === 'string') {
       if (titles.has(data.title)) warn(page, `The title "${data.title}" is also used by ${titles.get(data.title)}.`);
       titles.set(data.title, page);
@@ -300,7 +328,7 @@ function validateContext(plugins, { error, warn }) {
   }
 }
 
-function validatePage(page, d, body, { categoryIds, platformIds, error, warn }) {
+function validatePage(page, kind, d, body, { categoryIds, platformIds, error, warn }) {
   const dir = path.posix.dirname(page);
   for (const k of Object.keys(d)) {
     if (!(k in PAGE_KEYS)) error(page, `Unknown field "${k}". Check the spelling. Allowed fields: ${Object.keys(PAGE_KEYS).join(', ')}.`);
@@ -331,6 +359,8 @@ function validatePage(page, d, body, { categoryIds, platformIds, error, warn }) 
   list('categories', categoryIds, 'category');
   if (Array.isArray(d.categories) && !d.categories.length) error(page, '"categories" needs at least one category.');
   list('platforms', platformIds, 'platform');
+  // A prompt is pasted into one assistant and often relies on its features, such as artifacts.
+  if (kind === 'prompt' && !d.platforms?.length) error(page, '"platforms" is required for a prompt. List the assistants it works in, for example [claude].');
   list('tags');
   if (Array.isArray(d.tags)) {
     for (const t of d.tags) if (typeof t === 'string' && !NAME_RE.test(t)) error(page, `Tag "${t}" must be lowercase words joined by hyphens, such as "ai-search".`);
@@ -420,5 +450,5 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     console.log(`\nValidation failed: ${result.errors.length} error(s).`);
     process.exit(1);
   }
-  console.log(`\n✔ Valid: ${result.plugins.length} plugin(s), ${skillCount} skill(s), ${result.warnings.length} warning(s).`);
+  console.log(`\n✔ Valid: ${result.plugins.length} plugin(s), ${skillCount} skill(s), ${result.prompts.length} prompt(s), ${result.warnings.length} warning(s).`);
 }
