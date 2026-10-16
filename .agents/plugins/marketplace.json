@@ -17,6 +17,42 @@
       "category": "Productivity"
     },
     {
+      "name": "ai-visibility-prompts-generator",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ai-visibility-prompts-generator"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "unique-content-ideas-from-sales-calls",
+      "source": {
+        "source": "local",
+        "path": "./plugins/unique-content-ideas-from-sales-calls"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "write-and-publish-optimized-articles",
+      "source": {
+        "source": "local",
+        "path": "./plugins/write-and-publish-optimized-articles"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
       "name": "system-of-context",
       "source": {
         "source": "local",
