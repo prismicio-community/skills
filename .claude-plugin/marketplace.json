@@ -20,6 +20,52 @@
       ]
     },
     {
+      "name": "ai-visibility-prompts-generator",
+      "source": "./plugins/ai-visibility-prompts-generator",
+      "strict": false,
+      "description": "Generate the prompts to track in AI visibility tools such as Peec AI or Profound: a tagged, category-relevant buyer prompt library split equally across four buyer stages.",
+      "author": {
+        "name": "Prismic",
+        "url": "https://prismic.io"
+      },
+      "skills": [
+        "./skills/ai-visibility-prompts-generator"
+      ]
+    },
+    {
+      "name": "unique-content-ideas-from-sales-calls",
+      "source": "./plugins/unique-content-ideas-from-sales-calls",
+      "strict": false,
+      "description": "Find what customers say on your sales calls that nobody has published yet, proven with their own words, and turn it into article ideas only you can write.",
+      "author": {
+        "name": "Prismic",
+        "url": "https://prismic.io"
+      },
+      "skills": [
+        "./skills/unique-content-ideas-from-sales-calls"
+      ]
+    },
+    {
+      "name": "write-and-publish-optimized-articles",
+      "source": "./plugins/write-and-publish-optimized-articles",
+      "strict": false,
+      "description": "Write, SEO-optimize and publish articles end to end: research, interview, outline, draft, internal and external links, visuals, a fact-check of every claim, then an unpublished draft in your CMS (Prismic recommended).",
+      "author": {
+        "name": "Prismic",
+        "url": "https://prismic.io"
+      },
+      "skills": [
+        "./skills/write-rich-article",
+        "./skills/fact-check-seo-article",
+        "./skills/add-article-external-links",
+        "./skills/add-article-internal-links",
+        "./skills/plan-article-visuals",
+        "./skills/create-article-cms-draft",
+        "./skills/link-old-posts-to-new-article",
+        "./skills/personalize-article-writer"
+      ]
+    },
+    {
       "name": "personalized-landing-pages",
       "source": "./plugins/personalized-landing-pages",
       "strict": false,
