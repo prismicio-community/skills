@@ -1,0 +1,36 @@
+{
+  "name": "geo-action-plan",
+  "version": "0.1.0",
+  "description": "Turn your AI visibility tool's data into a ranked plan of pages to create or update, and sites and threads to get mentioned in, so AI assistants cite you.",
+  "author": {
+    "name": "Prismic",
+    "url": "https://prismic.io"
+  },
+  "repository": "https://github.com/prismicio-community/skills",
+  "license": "MIT",
+  "keywords": [
+    "geo",
+    "aeo",
+    "ai-search",
+    "content-plan",
+    "ai-visibility"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "GEO Action Plan",
+    "shortDescription": "Plan content for AI search",
+    "longDescription": "Turn your AI visibility tool's data into a ranked plan of pages to create or update, and sites and threads to get mentioned in, so AI assistants cite you.",
+    "developerName": "Prismic",
+    "category": "Productivity",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "logoDark": "./assets/icon.svg",
+    "capabilities": [
+      "Skills"
+    ],
+    "defaultPrompt": [
+      "Personalize the GEO action plan skill for my brand.",
+      "Build a GEO action plan for the tracked prompt with the lowest visibility. Last 30 days."
+    ]
+  }
+}

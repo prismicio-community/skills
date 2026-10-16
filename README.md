@@ -7,9 +7,7 @@ Free plugins, skills, and prompts from Prismic for Claude, ChatGPT, and other AI
 - A **prompt** is a single message you copy and paste into a chat, such as one that builds a dashboard. There's nothing to install. Copy it from the library page or from [`prompts/`](prompts/).
 
 > [!NOTE]
-> **Looking for the official Prismic skill?** It lives in [prismicio/skills](https://github.com/prismicio/skills), and it's the one the Prismic documentation recommends. It helps an assistant build and manage Prismic projects: content models, slices, and content, through the Prismic CLI and MCP server.
->
-> This repository is separate. It holds skills from Prismic for general website and content work, such as SEO, and these are the skills Prismic's marketing content links to. Assistants working on a Prismic project's code, models, or content should use `prismicio/skills`.
+> **Building a Prismic project?** Use the official Prismic skill in [prismicio/skills](https://github.com/prismicio/skills) instead. The Prismic documentation recommends it, and it helps your assistant work with content models, slices, and content. The skills here are for general website and content work, such as SEO.
 >
 > ```
 > npx skills add --global prismicio/skills
@@ -80,36 +78,11 @@ Every skill, plugin, and prompt is available as a file on the [library downloads
 | Downloaded file | Download the file again and upload or unzip it in place of the old one. |
 | Prompt | Copy the prompt again. Anything it already built keeps working as it is. |
 
-Every change merged into `main` is a new release. There are no version numbers to track.
-
-## What's in this repository
-
-```
-.claude-plugin/marketplace.json     Marketplace for Claude, Claude Code, and the skills CLI
-.agents/plugins/marketplace.json    Marketplace for ChatGPT and Codex
-plugins/<plugin>/                   One installable plugin
-  .codex-plugin/plugin.json         Plugin details for ChatGPT and Codex
-  assets/                           The plugin icon
-  skills/<skill>/                   One installable skill
-    SKILL.md                        Instructions the assistant follows
-    references/, assets/, scripts/  Files the skill uses while it works
-prompts/<prompt>.md                 One prompt, copied and pasted as written
-library-context/                    Library page content (not installed)
-  taxonomy.yml                      Allowed categories and platforms
-  plugins/<plugin>/index.md         Plugin page
-  plugins/<plugin>/skills/<skill>/index.md   Skill page
-  prompts/<prompt>/index.md         Prompt page
-docs/                               Templates and the website data format
-scripts/                            Validation and packaging
-```
-
-Plugins, skills, and prompts contain only what an assistant needs. Text and images for the library page live in `library-context/`, which mirrors the `plugins/` and `prompts/` folders and is never installed.
+Updates ship as soon as they are merged. There are no version numbers to track.
 
 ## Contribute
 
-Anyone at Prismic can add or update a plugin, skill, prompt, or library page through a pull request, including from the GitHub website without installing anything. See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-Maintainers and coding agents: see [AGENTS.md](AGENTS.md) for the repository rules and [docs/website-integration.md](docs/website-integration.md) for the data the library page uses.
+To suggest a change or add a skill or prompt, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
