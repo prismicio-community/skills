@@ -17,10 +17,10 @@
       "category": "Productivity"
     },
     {
-      "name": "ai-visibility-prompts-generator-for-tracking-tools",
+      "name": "ai-visibility-prompts-generator",
       "source": {
         "source": "local",
-        "path": "./plugins/ai-visibility-prompts-generator-for-tracking-tools"
+        "path": "./plugins/ai-visibility-prompts-generator"
       },
       "policy": {
         "installation": "AVAILABLE",

@@ -1,6 +1,6 @@
 ---
 name: ai-visibility-prompts-generator
-description: "Generate the prompts to track in an AI visibility tool (Peec AI, Profound, Otterly and similar): a tagged library of buyer prompts for one product, split equally across Unaware, Problem-Aware, Solution-Aware and Category-Aware stages, category-relevant only. Use for 'what prompts should we track', 'build a prompt library', 'would ChatGPT recommend us', or to audit an existing tracked-prompt set."
+description: "Generate the prompts to track in an AI visibility tool (Peec AI, Profound and similar): a tagged library of buyer prompts for one product, split equally across Unaware, Problem-Aware, Solution-Aware and Category-Aware stages, category-relevant only. Use for 'what prompts should we track', 'build a prompt library', 'would ChatGPT recommend us', or to audit an existing tracked-prompt set. For what to publish to win prompts, use geo-action-plan."
 ---
 
 # AI Visibility Prompts Generator

@@ -20,11 +20,11 @@ Positioning contamination is the most common and most damaging failure. For each
 
 If a prompt describes the product's exact shape, it fails, even if it names no features and sounds conversational.
 
-Examples (product: a content platform positioned as "monitoring isn't enough — we turn visibility gaps into published pages, grounded in your company's knowledge"):
+Examples (product: an analytics tool positioned as "stop guessing — every chart comes with the session recordings that explain it"):
 
-- ❌ "Is there a platform that both monitors our AI visibility and helps us fix it in one place?" — the positioning narrative as a question
-- ❌ "What AI content tools actually write from your company's own knowledge instead of generic web info?" — the differentiator as a question
-- ✅ "We track our AI visibility but acting on the gaps is all manual — are there tools that actually create the content to fix them?" — starts from the buyer's observed pain
+- ❌ "Is there an analytics tool that shows the session recording behind every chart?" — the positioning narrative as a question
+- ❌ "What analytics tools explain the why behind the numbers, not just the what?" — the differentiator as a question
+- ✅ "We can see people drop off on our pricing page but have no idea why — are there tools that help figure that out?" — starts from the buyer's observed pain
 
 The test is *origin*: does the phrasing arise naturally from the buyer's situation, or only from having absorbed the vendor's pitch?
 

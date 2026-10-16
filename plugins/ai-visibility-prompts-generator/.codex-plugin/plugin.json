@@ -1,5 +1,5 @@
 {
-  "name": "ai-visibility-prompts-generator-for-tracking-tools",
+  "name": "ai-visibility-prompts-generator",
   "version": "0.1.0",
   "description": "Generate the prompts to track in AI visibility tools such as Peec AI or Profound: a tagged, category-relevant buyer prompt library split equally across four buyer stages.",
   "author": {
@@ -18,7 +18,7 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "AI Visibility Prompts",
+    "displayName": "AI Visibility Prompts Generator",
     "shortDescription": "Prompts for AI visibility",
     "longDescription": "Generate the prompts to track in AI visibility tools such as Peec AI or Profound: a tagged, category-relevant buyer prompt library split equally across four buyer stages.",
     "developerName": "Prismic",
