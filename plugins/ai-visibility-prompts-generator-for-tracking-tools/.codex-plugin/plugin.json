@@ -1,0 +1,37 @@
+{
+  "name": "ai-visibility-prompts-generator-for-tracking-tools",
+  "version": "0.1.0",
+  "description": "Generate the prompts to track in AI visibility tools such as Peec AI or Profound: a tagged, category-relevant buyer prompt library split equally across four buyer stages.",
+  "author": {
+    "name": "Prismic",
+    "url": "https://prismic.io"
+  },
+  "repository": "https://github.com/prismicio-community/skills",
+  "license": "MIT",
+  "keywords": [
+    "ai-visibility",
+    "prompt-tracking",
+    "geo",
+    "aeo",
+    "ai-search",
+    "prompt-library"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AI Visibility Prompts",
+    "shortDescription": "Prompts for AI visibility",
+    "longDescription": "Generate the prompts to track in AI visibility tools such as Peec AI or Profound: a tagged, category-relevant buyer prompt library split equally across four buyer stages.",
+    "developerName": "Prismic",
+    "category": "Productivity",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "logoDark": "./assets/icon.svg",
+    "capabilities": [
+      "Skills"
+    ],
+    "defaultPrompt": [
+      "Generate AI visibility tracking prompts for https://example.com/product",
+      "Audit the prompts we track in our AI visibility tool against this product page"
+    ]
+  }
+}
