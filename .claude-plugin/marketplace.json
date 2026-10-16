@@ -20,6 +20,19 @@
       ]
     },
     {
+      "name": "ai-visibility-prompts-generator",
+      "source": "./plugins/ai-visibility-prompts-generator",
+      "strict": false,
+      "description": "Generate the prompts to track in AI visibility tools such as Peec AI or Profound: a tagged, category-relevant buyer prompt library split equally across four buyer stages.",
+      "author": {
+        "name": "Prismic",
+        "url": "https://prismic.io"
+      },
+      "skills": [
+        "./skills/ai-visibility-prompts-generator"
+      ]
+    },
+    {
       "name": "write-and-publish-optimized-articles",
       "source": "./plugins/write-and-publish-optimized-articles",
       "strict": false,
