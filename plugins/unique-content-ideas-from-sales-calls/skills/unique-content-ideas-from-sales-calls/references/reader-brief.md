@@ -23,7 +23,7 @@ An insight is something learned from the call about how customers actually think
 Benchmark example: To test GEO, an enterprise team was not running experiments on its main website. It built subdomains and throwaway sites to test tactics first, and only then rolled what worked onto the main site. Why this is an insight: the public GEO conversation assumes tactics are applied to the main site. The call revealed a hidden workflow (sandboxed GEO testing), implying many enterprises aren't yet deploying GEO on their main sites at all. Behavioural, specific, surprising, not findable by search.
 
 NOT insights — reject however strongly said:
-- Known industry pain points restated: legacy tools are rigid, migrations are hard, rolling changes out across many markets is painful, AI speeds up content creation, teams want personalization, security review slows deals. <Add the known pain points from the brand settings, if any.>
+- Known pain points restated. Generic examples that apply in any category: the current tool is hard to change, switching vendors is painful, the team is stretched, AI saves time, budgets need sign-off, security review slows deals. <Add the known pain points from the brand settings, if any.>
 - Anything a competent marketer could argue from first principles or find on page one of search results.
 - Product reactions and feature requests ("liked the dashboard", "asked for SSO").
 - Generic buying-process facts ("several teams involved", "want a pilot first").

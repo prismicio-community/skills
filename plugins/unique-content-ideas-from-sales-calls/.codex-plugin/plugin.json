@@ -17,7 +17,7 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Unique Content Ideas from Sales Calls",
+    "displayName": "Content Ideas from Sales Calls",
     "shortDescription": "Content ideas from your calls",
     "longDescription": "Find what customers say on your sales calls that nobody has published yet, proven with their own words, and turn it into article ideas only you can write.",
     "developerName": "Prismic",

@@ -1,13 +1,13 @@
 ---
 name: unique-content-ideas-from-sales-calls
-description: "Mine sales and customer call transcripts for insights nobody has published, prove each with verbatim customer quotes and a novelty check, then turn the survivors into article ideas. Use for 'content ideas from our sales calls', 'what can we write about from this week's calls', 'mine our call transcripts', or to check if a call-based idea is new. Not for call summaries or for writing the article."
+description: "Mine sales and customer call transcripts for insights nobody has published, prove each with verbatim customer quotes and a novelty check, then turn the survivors into article ideas. Use for 'content ideas from sales calls', 'what can we write about from this week's calls', 'mine our call transcripts', or to check if a call-based idea is new. Not for call summaries or writing the article; to plan pages from AI-citation data, use geo-action-plan."
 ---
 
 # Unique Content Ideas from Sales Calls
 
 Your company records conversations no competitor can hear. This skill finds the few things in those conversations that **nobody could learn by searching the web**, proves it, and only then turns them into article ideas. The goal is non-commodity content: content only this company can write.
 
-Do not use it to summarize calls, coach reps, write the article, plan pages from AI-citation or search data, or edit a draft.
+Do not use it to summarize calls, coach reps, write the article, or edit a draft. To plan pages from what AI assistants cite and what ranks in search, use geo-action-plan.
 
 The order of a run is fixed and never skipped:
 
@@ -55,7 +55,7 @@ Why this is an insight: the public GEO conversation assumes tactics are applied 
 
 **Not insights. Reject these, however strongly the customer said them:**
 
-- Known industry pain points restated by a customer: legacy tools are rigid, migrations are hard, rolling changes out across many markets is painful, AI speeds up content creation, teams want personalization, security review slows deals. Add the category's known pain points from the brand settings, if any.
+- Known pain points restated by a customer. Generic examples that apply in any category: the current tool is hard to change, switching vendors is painful, the team is stretched, AI saves time, budgets need sign-off, security review slows deals. Add the category's own known pain points from the brand settings; personalization researches them for each brand.
 - Anything a competent marketer could argue from first principles or find on the first page of search results.
 - Product reactions and feature requests ("they liked the dashboard", "they asked for SSO").
 - Generic buying-process facts ("several teams are involved", "they want a pilot first").
