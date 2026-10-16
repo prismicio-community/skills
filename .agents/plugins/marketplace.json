@@ -3,5 +3,18 @@
   "interface": {
     "displayName": "Prismic Community"
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "geo-action-plan",
+      "source": {
+        "source": "local",
+        "path": "./plugins/geo-action-plan"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
 }
