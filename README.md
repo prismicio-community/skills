@@ -6,9 +6,7 @@ Free plugins and skills from Prismic for Claude, ChatGPT, and other AI assistant
 - A **plugin** bundles one or more related skills so you can install them together.
 
 > [!NOTE]
-> **Looking for the official Prismic skill?** It lives in [prismicio/skills](https://github.com/prismicio/skills), and it's the one the Prismic documentation recommends. It helps an assistant build and manage Prismic projects: content models, slices, and content, through the Prismic CLI and MCP server.
->
-> This repository is separate. It holds skills from Prismic for general website and content work, such as SEO, and these are the skills Prismic's marketing content links to. Assistants working on a Prismic project's code, models, or content should use `prismicio/skills`.
+> **Building a Prismic project?** Use the official Prismic skill in [prismicio/skills](https://github.com/prismicio/skills) instead. The Prismic documentation recommends it, and it helps your assistant work with content models, slices, and content. The skills here are for general website and content work, such as SEO.
 >
 > ```
 > npx skills add --global prismicio/skills
@@ -77,34 +75,11 @@ Every skill and plugin is available as a file on the [library downloads release]
 | skills CLI | Run `npx skills update`. |
 | Downloaded file | Download the file again and upload or unzip it in place of the old one. |
 
-Every change merged into `main` is a new release. There are no version numbers to track.
-
-## What's in this repository
-
-```
-.claude-plugin/marketplace.json     Marketplace for Claude, Claude Code, and the skills CLI
-.agents/plugins/marketplace.json    Marketplace for ChatGPT and Codex
-plugins/<plugin>/                   One installable plugin
-  .codex-plugin/plugin.json         Plugin details for ChatGPT and Codex
-  assets/                           The plugin icon
-  skills/<skill>/                   One installable skill
-    SKILL.md                        Instructions the assistant follows
-    references/, assets/, scripts/  Files the skill uses while it works
-library-context/                    Library page content (not installed)
-  taxonomy.yml                      Allowed categories and platforms
-  plugins/<plugin>/index.md         Plugin page
-  plugins/<plugin>/skills/<skill>/index.md   Skill page
-docs/                               Templates and the website data format
-scripts/                            Validation and packaging
-```
-
-Plugins and skills contain only what an assistant needs. Text and images for the library page live in `library-context/`, which mirrors the `plugins/` folder and is never installed.
+Updates ship as soon as they are merged. There are no version numbers to track.
 
 ## Contribute
 
-Anyone at Prismic can add or update a plugin, skill, or library page through a pull request, including from the GitHub website without installing anything. See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-Maintainers and coding agents: see [AGENTS.md](AGENTS.md) for the repository rules and [docs/website-integration.md](docs/website-integration.md) for the data the library page uses.
+To suggest a change or add a skill, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
