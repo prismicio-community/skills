@@ -49,7 +49,7 @@ exception that is quietly padded is a fabricated quote.
 ## The H1
 
 - States the account's stakes, written from their problem, not from a product feature.
-- Contains the company name exactly as the company writes it. Respect lowercase and internal spacing (`adidas`, `ABN AMRO`).
+- Contains the company name exactly as the company writes it. Respect lowercase and internal spacing (`acme`, `Northwind Bank`).
 - The name appears once, and generally nowhere else on the page. Repeating it reads as mail merge.
 - Stays within the base H1's character count + 10%, company name included.
 - If the name does not fit, cut other words to make room. Never extend the line.
