@@ -1,0 +1,36 @@
+{
+  "name": "unique-content-ideas-from-sales-calls",
+  "version": "0.1.0",
+  "description": "Find what customers say on your sales calls that nobody has published yet, proven with their own words, and turn it into article ideas only you can write.",
+  "author": {
+    "name": "Prismic",
+    "url": "https://prismic.io"
+  },
+  "repository": "https://github.com/prismicio-community/skills",
+  "license": "MIT",
+  "keywords": [
+    "content-ideas",
+    "sales-calls",
+    "call-transcripts",
+    "customer-insights",
+    "content-strategy"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Unique Content Ideas from Sales Calls",
+    "shortDescription": "Content ideas from your calls",
+    "longDescription": "Find what customers say on your sales calls that nobody has published yet, proven with their own words, and turn it into article ideas only you can write.",
+    "developerName": "Prismic",
+    "category": "Productivity",
+    "composerIcon": "./assets/icon.svg",
+    "logo": "./assets/icon.svg",
+    "logoDark": "./assets/icon.svg",
+    "capabilities": [
+      "Skills"
+    ],
+    "defaultPrompt": [
+      "Personalize the unique content ideas skill for my brand.",
+      "Find unique content ideas in this week's sales calls."
+    ]
+  }
+}

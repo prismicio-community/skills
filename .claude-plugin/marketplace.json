@@ -18,6 +18,19 @@
       "skills": [
         "./skills/geo-action-plan"
       ]
+    },
+    {
+      "name": "unique-content-ideas-from-sales-calls",
+      "source": "./plugins/unique-content-ideas-from-sales-calls",
+      "strict": false,
+      "description": "Find what customers say on your sales calls that nobody has published yet, proven with their own words, and turn it into article ideas only you can write.",
+      "author": {
+        "name": "Prismic",
+        "url": "https://prismic.io"
+      },
+      "skills": [
+        "./skills/unique-content-ideas-from-sales-calls"
+      ]
     }
   ]
 }
