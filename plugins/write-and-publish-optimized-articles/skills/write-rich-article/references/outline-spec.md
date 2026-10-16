@@ -38,14 +38,14 @@ Every template includes a **navigational H2**: a variation of the H1 containing 
 - **Competitor Comparison**: TL;DR → Intro → Quick overviews → Navigational H2 → Feature-by-feature (H3 per dimension) → Comparison table → Best for (H3 per tool) → Consider also: [Brand] → Conclusion → FAQ
 - **Comprehensive Guide**: TL;DR → Intro → Foundations (only if needed) → Navigational H2 → Core sections → Worked examples → Common mistakes → Key takeaways → Next steps → FAQ
 - **How-To / Tutorial**: TL;DR → Intro → Prerequisites → Navigational H2 → Steps (H3 each, numbered) → Troubleshooting → Verifying the result → Next steps → FAQ
-- **Conceptual Explainer**: TL;DR → Intro → Core explanation → Navigational H2 → How it works in practice → Real-world implications → Adjacent concepts → FAQ → Next steps
-- **MoFU Decision Support**: TL;DR → Intro → Named framework → Navigational H2 → Deep dive per criterion → Scenarios → Questions to ask vendors → Brand fit → FAQ → Next steps
+- **Conceptual Explainer**: TL;DR → Intro → Core explanation → Navigational H2 → How it works in practice → Real-world implications → Adjacent concepts → Next steps → FAQ
+- **MoFU Decision Support**: TL;DR → Intro → Named framework → Navigational H2 → Deep dive per criterion → Scenarios → Questions to ask vendors → Brand fit → Next steps → FAQ
 
 Templates are skeletons. The differentiating sections come from the Phase 1 gaps and get added on top. Do not let a template's completeness substitute for the research.
 
 **Number the entries** in listicles, alternatives lists and comparisons. Numbering restarts within each category in a segmented listicle.
 
-**Never group two named products under one heading.** "SEOmatic and the generation platforms" is a heading that cheats: the reader came for a verdict on SEOmatic and got a category. Every product named in the article gets its own numbered entry, or it is not named at all.
+**Never group two named products under one heading.** "Tool A and the generation platforms" is a heading that cheats: the reader came for a verdict on Tool A and got a category. Every product named in the article gets its own numbered entry, or it is not named at all.
 
 **Put the primary keyword in the category headings** of a segmented listicle, so each section can be retrieved on its own. "GEO tools for tracking your AI visibility" beats "Category one: tools that tell you where you stand".
 
@@ -161,7 +161,7 @@ Answer every column for every tool, including your own, and use "No" where the h
 
 Plan links in the outline, not after drafting. List:
 - 4–8 internal link candidates with the section each belongs in and proposed anchor text.
-- 2–4 external primary sources with the claim each supports.
+- 3–5 external primary sources with the claim each supports.
 - Every link the user supplied in the interview, with its intended placement, or a note explaining why it does not fit.
 
 ## Approval gate

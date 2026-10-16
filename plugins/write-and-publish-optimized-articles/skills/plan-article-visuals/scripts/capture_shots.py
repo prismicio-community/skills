@@ -14,15 +14,15 @@ Shot list is a JSON array. Only `id`, `name` and `url` are required:
 [
   {
     "id": 3,
-    "name": "seomatic-pricing",
-    "url": "https://seomatic.ai/pricing",
+    "name": "tool-b-pricing",
+    "url": "https://example.com/pricing",
     "wait_for": "text=Launch",        optional CSS or text selector
     "clip_to": ".pricing-table",      optional: crop to this element
     "hide": [".cookie-banner", "#intercom"],   optional: remove before shooting
     "click": ["text=Decline All"],    optional: dismiss consent properly first
     "full_page": false,
     "wait_until": "domcontentloaded",   optional: for sites that never idle
-    "supports": "the claim that SEOmatic starts at $149"
+    "supports": "the claim that Tool B's paid plan has a published price"
   }
 ]
 
@@ -30,11 +30,14 @@ Writes a PNG per shot plus `manifest.json` recording the capture date, final
 URL and viewport, which is what makes a screenshot auditable six months later.
 
 Only works on pages reachable without a login. Anything behind authentication
-should be captured in a real browser session instead: see the skill's notes on
-Claude for Chrome.
+should be captured by a person in a real browser session instead.
+
+Needs Playwright and a Chromium build (pip install playwright, then
+python -m playwright install chromium). Ask before installing them.
 """
 
 import argparse
+import re
 import json
 import sys
 from datetime import date, datetime, timezone
@@ -101,7 +104,8 @@ def capture(page, shot, out_dir, viewport):
     page.evaluate("() => window.scrollTo(0, 0)")
     page.wait_for_timeout(600)          # let layout settle after hiding
 
-    path = out_dir / f"{shot['id']:02d}-{shot['name']}.png"
+    safe = re.sub(r"[^a-z0-9-]+", "-", str(shot.get("name", "shot")).lower()).strip("-") or "shot"
+    path = out_dir / f"{int(shot['id']):02d}-{safe[:60]}.png"
     target, clipped = page, False
     if shot.get("clip_to"):
         el = page.query_selector(shot["clip_to"])

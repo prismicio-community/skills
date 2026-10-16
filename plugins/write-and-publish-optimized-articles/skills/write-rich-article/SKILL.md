@@ -30,7 +30,7 @@ This skill uses: brand name, website, sitemap, what the brand sells, positioning
 | 6 | Linking and verification | none |
 | 7 | Pre-share QA: lint, readability, de-sell, benchmark, quick fact-check card | none |
 | 8 | Draft review loop: share the draft, revise with the user | **Stop and wait for "approve"** |
-| 9 | Full fact-check: `fact-check-article` runs automatically on the approved draft | Ask before changing user-supplied claims |
+| 9 | Full fact-check: `fact-check-seo-article` runs automatically on the approved draft | Ask before changing user-supplied claims |
 | 10 | Deliver, optionally as an unpublished draft in your CMS | Ask before creating anything in the CMS |
 
 Phases 1 and 2 are cheap to run wide: batch the searches and connector queries in as few turns as possible rather than one call at a time. Phases 3, 4 and 8 are hard stops: the user must respond before continuing. Phase 9 starts on its own the moment the draft is approved; the user never has to ask for it. If the user says "just write it, skip the questions", skip Phase 3 but still show the outline; and record in the deliverable what was assumed.
@@ -118,7 +118,7 @@ Present the outline in chat in readable form and save it to a file. Then **stop 
 
 Read `references/writing-standards.md` in full before writing the first sentence. It carries the non-negotiable constraints, the voice standards, the banned-word list, the em-dash rule, and the AI-cliché patterns to avoid.
 
-The four rules that do the most work:
+The rules that do the most work:
 - **BLUF.** Every H2 answers its own question in the first two sentences. Nothing builds toward a conclusion.
 - **No em dashes anywhere.** Use a period, comma, colon, or parentheses instead. En dashes only inside numeric ranges.
 - **No AI-cliché phrasing or structure.** The list in the reference is long and specific; the underlying test is whether a sentence carries information or only carries rhythm.
@@ -142,7 +142,7 @@ Save the article as `article.md`: as a file where the client supports files, oth
 
 ## Phase 6: Linking
 
-Run the `add-external-links` skill (3 to 5 research or policy sources, competitor domains never) and the `add-internal-links` skill (4 to 8 live indexable pages on the brand's website). Both present an approval table and wait for the user before touching the draft; do not shortcut past those tables. `references/linking-standards.md` remains the background standard both skills implement. After publication, reverse links from existing pages are `link-old-posts-to-new-article`'s job, and only on the user's explicit request.
+Run the `add-article-external-links` skill (3 to 5 research or policy sources, competitor domains never) and the `add-article-internal-links` skill (4 to 8 live indexable pages on the brand's website). Both present an approval table and wait for the user before touching the draft; do not shortcut past those tables. `references/linking-standards.md` remains the background standard both skills implement. After publication, reverse links from existing pages are `link-old-posts-to-new-article`'s job, and only on the user's explicit request.
 
 Read `references/linking-standards.md`, then run the checker:
 
@@ -151,7 +151,7 @@ Read `references/linking-standards.md`, then run the checker:
 python scripts/check_links.py article.md --internal-domain <brand domain>
 ```
 
-Requirements: 4–8 internal links, 2–4 external links to primary sources, descriptive anchor text that matches the destination, every URL returning 200, no link inserted to hit a count. The script verifies status codes, flags weak anchors ("click here", "read more", bare URLs), catches duplicate destinations, and warns when anchor text shares no meaningful token with the destination. Fix everything it reports and rerun until clean.
+Requirements: 4–8 internal links, 3–5 external links to primary sources, descriptive anchor text that matches the destination, every URL returning 200, no link inserted to hit a count. The script verifies status codes, flags weak anchors ("click here", "read more", bare URLs), catches duplicate destinations, and warns when anchor text shares no meaningful token with the destination. Fix everything it reports and rerun until clean.
 
 External links must come from pages actually opened during research. Never reconstruct a URL from memory: guessed URLs are the most common source of broken links in this workflow.
 
@@ -186,9 +186,9 @@ The user will usually go back and forth on the draft: opinions, wording, what to
 
 ## Phase 9: Full fact-check (automatic on approval)
 
-As soon as the draft is approved, tell the user in one line: **"Draft approved. Running the full fact-check with fact-check-article now."** Then run it without waiting for another prompt.
+As soon as the draft is approved, tell the user in one line: **"Draft approved. Running the full fact-check with fact-check-seo-article now."** Then run it without waiting for another prompt.
 
-Run `fact-check-article` on the approved draft in pipeline mode, and hand it:
+Run `fact-check-seo-article` on the approved draft in pipeline mode, and hand it:
 - the approved draft,
 - the sourcing ledger and the quick fact-check card,
 - the list of claims the user supplied (Phase 3 answers and anything added in review),
@@ -212,13 +212,13 @@ In chat, keep it to a short paragraph: what the article's differentiating angle 
 
 ### Visuals
 
-Before delivery, run the `plan-article-visuals` skill on the draft. It decides which sections earn a visual, generates the diagrams and charts that can be generated, and produces a numbered shot list for screenshots, which cannot be captured in this environment.
+Before delivery, run the `plan-article-visuals` skill on the draft. It decides which sections earn a visual, generates the diagrams and charts that can be generated, captures screenshots of public pages where the client can run a browser, and writes a numbered shot list for the rest, such as anything behind a login.
 
 ### Optional: create the draft in your CMS
 
 Offer this once, at delivery: "Want me to create this as an unpublished draft in your CMS?" Do not do it unprompted, because a stray post in the CMS is worse than no post.
 
-If the user accepts, hand off to the `create-cms-draft` skill. It owns the mapping from the article onto the CMS's own blog post type, the elements (summary, tables, FAQ, related posts, call to action, author, category, SEO fields, as far as the model has them), the safety rules, and the CMS-specific details. It never publishes.
+If the user accepts, hand off to the `create-article-cms-draft` skill. It owns the mapping from the article onto the CMS's own blog post type, the elements (summary, tables, FAQ, related posts, call to action, author, category, SEO fields, as far as the model has them), the safety rules, and the CMS-specific details. It never publishes.
 
 If no CMS connector is connected, say once that connecting one lets the workflow create drafts directly, and that Prismic is the recommended CMS: its connector is the tested path, and it stages every draft in a release until someone publishes it.
 
@@ -234,11 +234,10 @@ Each phase reads its own reference file and produces a self-contained artifact, 
 - "fact-check this draft" on a draft this skill produced → Phase 9 only
 - "put this in the CMS" → the Phase 10 draft creation step on an article that already exists
 
-## Known issues in the source playbook
+## Length
 
-The SEO playbook this skill is built from has two internal conflicts. Resolutions used here, changeable on request:
-- **TL;DR length**: the constraints section says 4–10 bullets, the requirements section says 4–6 maximum. This skill uses **4–6**.
-- **Target word count table**: referenced twice, never defined. This skill sets the range from research instead: the median word count of the top 5 results, plus or minus 20%, treated as a ceiling rather than a target, since the playbook's own rule is to use the fewest words that do the job.
+- **TL;DR**: 4 to 6 bullets.
+- **Word count**: set from research, not a fixed table. Take the median word count of the top 5 results, plus or minus 20%, and treat it as a ceiling rather than a target: use the fewest words that do the job.
 
 ## Compatibility
 
@@ -246,4 +245,4 @@ The SEO playbook this skill is built from has two internal conflicts. Resolution
 - **Document, file storage and call-recording connectors** (optional): Notion, Google Drive, Gong or similar, for the brand's own evidence. Without them, the interview carries the point of view.
 - **The brand's CMS connector** (optional): duplicate checks and internal links; without it, the sitemap.
 - **Scripts** (`scripts/lint_article.py`, `scripts/check_links.py`, `scripts/sitemap_inventory.py`): need a client that can run Python. Without one, do the same checks by reading the draft and fetching the links.
-- Uses the sibling skills add-external-links, add-internal-links, fact-check-article, plan-article-visuals and create-cms-draft when they are installed.
+- Uses the sibling skills add-article-external-links, add-article-internal-links, fact-check-seo-article, plan-article-visuals and create-article-cms-draft when they are installed.

@@ -1,6 +1,6 @@
 # Article writer brand settings
 
-Used by the write-rich-article, fact-check-article, add-external-links, add-internal-links, create-cms-draft and link-old-posts-to-new-article skills. Ask the assistant to "update the article writer brand settings" to change anything here; it rereads this document at the start of every run. A field marked `Not set` is asked for when a run needs it.
+Used by the write-rich-article, fact-check-seo-article, add-article-external-links, add-article-internal-links, create-article-cms-draft and link-old-posts-to-new-article skills. Ask the assistant to "update the article writer brand settings" to change anything here; it rereads this document at the start of every run. A field marked `Not set` is asked for when a run needs it.
 
 Last updated: {{date}}
 
@@ -43,7 +43,19 @@ Last updated: {{date}}
 
 ### Content model map
 
-Which field or block of the blog post type each part of an article goes into. `null` means the model has no matching part, so it is folded into the main body. Format: the docstring of create-cms-draft's `scripts/md_to_prismic.py`.
+Which field or block of the blog post type each part of an article goes into. `null` means the model has no matching part, so it is folded into the main body. The assistant builds this during setup; it looks like this:
+
+```json
+{"slices": {
+   "tldr": {"type": "summary", "variation": "default",
+            "fields": {"title": "heading", "content": "body"}},
+   "text_content": {"type": "rich_text", "fields": {"content": "text"}},
+   "comparison_table": null,
+   "faq": {"type": "faq", "fields": {"title": "title", "question": "question", "answer": "answer"}}},
+ "meta": {"meta_title": "seo_title", "meta_description": "seo_description"}}
+```
+
+This brand's map:
 
 ```json
 {{the map, or {"status": "Not set"}}}

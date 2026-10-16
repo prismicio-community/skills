@@ -21,11 +21,11 @@ Placement rules:
 - No link in the TL;DR. It is a summary, not a navigation menu.
 - Never insert a link to reach the count of 4. If only three internal links fit honestly, report that instead of padding, and note which planned page would fix it.
 
-## External links: 2 to 4
+## External links: 3 to 5
 
 Primary sources only: official documentation, the actual study or dataset, standards bodies (W3C, MDN, IETF), government or regulator publications, official pricing and changelog pages, recognised engineering publications.
 
-Not: content-marketing blogs restating a study, statistics aggregator sites, SEO listicles, competitor marketing pages (the exception is quoting a competitor's own documented behaviour, where their docs are the primary source).
+Not: content-marketing blogs restating a study, statistics aggregator sites, SEO listicles, and any page on a competitor's domain. When a claim about a competitor needs evidence, use a screenshot of their page or a neutral third-party source, as add-article-external-links does.
 
 Go upstream. If a blog cites "a 2024 Gartner finding", find the Gartner page. If the primary source sits behind a paywall, link it anyway and attribute in text, rather than linking a free page that misquotes it.
 

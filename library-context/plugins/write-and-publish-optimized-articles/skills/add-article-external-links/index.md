@@ -1,5 +1,5 @@
 ---
-title: Add External Links
+title: Add Article External Links
 summary: Add 3 to 5 verified links to primary sources in an article draft, never to competitors, with your approval first.
 description: A free AI skill that picks, verifies and places outbound links to research, data and official docs in an article draft.
 categories: [content, seo]

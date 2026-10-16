@@ -21,7 +21,7 @@ This skill holds no brand details. They live in a brand settings document the us
 
 This skill uses: website, CMS and its connector, the live site, space or repository, the blog post type, its related-posts block, and whether edits to published posts can be staged. A setting marked `Not set`, or missing, means: ask the user at the step that uses it. Wherever this file says "the brand settings", it means that document, and "the brand" means the brand it describes.
 
-**Staged** means the CMS keeps edits to a published post unpublished until a person republishes it: Prismic releases do, and so do some other CMSs (see `references/other-cms.md`). **Suggestions only** is the safe default for every other case, and for any CMS without a connector.
+**Staged** means the CMS keeps edits to a published post unpublished until a person republishes it: Prismic releases do, and so do some other CMSs (see `references/cms-staging.md`). **Suggestions only** is the safe default for every other case, and for any CMS without a connector.
 
 ## Phase map
 
@@ -71,7 +71,7 @@ Present exactly this, then stop and wait:
 - One staging container per campaign (Prismic: a release named `Interlinking: <article title>`).
 - Get each page's current version immediately before editing; live pages move, and a stale version is rejected.
 - Change only the targeted block or item. Everything else in the post is preserved exactly, including edits people made in the CMS.
-- For Prismic, the editor-shape rules in `references/prismic.md` apply.
+- Read `references/cms-staging.md` first: it has the CMS-specific rules, including how Prismic link positions and related-posts items are written.
 
 **Suggestions only:**
 - Hand over the approved rows as a checklist: page URL, the exact existing words, the link URL, and where on the page the words sit. The user makes the edits in their CMS.

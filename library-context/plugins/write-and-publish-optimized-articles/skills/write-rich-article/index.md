@@ -58,7 +58,7 @@ The article carries what no competitor page has: the gaps in what ranks, real qu
 
 - **The article**, with meta title, meta description and slug at the top. It pastes or imports into any CMS.
 - **A research appendix**: the gap analysis, audience profile, community questions, your internal evidence, the sourcing ledger, the link inventory and the full fact-check report.
-- **A visual plan**: diagrams and charts, and a shot list for screenshots.
+- **A visual plan**: diagrams and charts, screenshots of public pages, and a shot list for anything behind a login.
 
 ## Setup
 

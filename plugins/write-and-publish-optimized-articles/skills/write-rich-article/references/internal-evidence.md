@@ -4,7 +4,7 @@ Public research tells you what everyone knows. Internal evidence is where the ar
 
 Work through every source listed under Knowledge sources and Positioning and messaging sources in the brand settings, plus anything the user shared in this conversation. When a source is unavailable, say so in one line rather than silently skipping it. The user may be able to connect it or paste the material. With no internal sources at all, the article still works: Phase 3's interview becomes the main source of point of view, and the deliverable says so.
 
-If a tool is not in the current tool list, run `tool_search` for it before concluding it is unavailable. Connectors are frequently deferred rather than absent.
+If a connector's tools don't appear to be available, search the available tools for them before concluding the connector is missing. Connectors are often loaded on demand rather than absent.
 
 ## Call recordings (Gong, Modjo, Chorus, Fathom or similar)
 

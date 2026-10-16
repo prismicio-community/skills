@@ -30,11 +30,11 @@
       },
       "skills": [
         "./skills/write-rich-article",
-        "./skills/fact-check-article",
-        "./skills/add-external-links",
-        "./skills/add-internal-links",
+        "./skills/fact-check-seo-article",
+        "./skills/add-article-external-links",
+        "./skills/add-article-internal-links",
         "./skills/plan-article-visuals",
-        "./skills/create-cms-draft",
+        "./skills/create-article-cms-draft",
         "./skills/link-old-posts-to-new-article",
         "./skills/personalize-article-writer"
       ]

@@ -1,6 +1,6 @@
 ---
-title: Full Content Creation Workflow (Write & Publish Optimized Articles)
-summary: Write SEO-optimized articles, fact-check every claim, and publish them as drafts in your CMS, from one keyword.
+title: Write and Publish Optimized Articles
+summary: Write SEO-optimized articles, fact-check every claim, and create them as unpublished drafts in your CMS, from one keyword.
 description: A free AI plugin that researches, writes, fact-checks and SEO-optimizes articles, then creates them as drafts in your CMS. Prismic recommended.
 categories: [content, seo]
 tags: [seo, content-writing, articles, fact-check, internal-links, cms, prismic]
@@ -22,16 +22,16 @@ examples:
 
 ## How it works
 
-This plugin takes an article from a keyword to an unpublished draft in your CMS. It writes the article, does the SEO work, fact-checks it, and publishes it to your CMS as a draft for someone to review. Use as much of it as you need: stop at the research, at the finished article, or go all the way to the draft.
+A full content creation workflow. This plugin takes an article from a keyword to an unpublished draft in your CMS. It writes the article, does the SEO work, fact-checks it, and creates it in your CMS as an unpublished draft for someone to review and publish. Use as much of it as you need: stop at the research, at the finished article, or go all the way to the draft.
 
 It installs eight skills that hand work to each other:
 
 - **Write Rich Article** (`write-rich-article`): researches what ranks and what people ask, mines your own docs and calls, interviews you, writes to an outline you approved, and revises the draft with you until you approve it.
-- **Fact-check Article** (`fact-check-article`): verifies every claim and piece of advice against a source it opened, and checks claims about your brand against your latest positioning. Runs on its own when you approve a draft.
-- **Add External Links** (`add-external-links`): 3 to 5 links to primary sources, never to competitors.
-- **Add Internal Links** (`add-internal-links`): 4 to 8 links to live pages on your site.
+- **Fact-check SEO Article** (`fact-check-seo-article`): verifies every claim and piece of advice against a source it opened, and checks claims about your brand against your latest positioning. Runs on its own when you approve a draft.
+- **Add Article External Links** (`add-article-external-links`): 3 to 5 links to primary sources, never to competitors.
+- **Add Article Internal Links** (`add-article-internal-links`): 4 to 8 links to live pages on your site.
 - **Plan Article Visuals** (`plan-article-visuals`): diagrams, charts and a screenshot shot list.
-- **Create CMS Draft** (`create-cms-draft`): creates the finished article as an unpublished draft in your CMS, mapped onto your blog's structure. Never publishes.
+- **Create Article CMS Draft** (`create-article-cms-draft`): creates the finished article as an unpublished draft in your CMS, mapped onto your blog's structure. Never publishes.
 - **Link Old Posts to New Article** (`link-old-posts-to-new-article`): once a post is live and you ask, links to it from your existing posts.
 - **Personalize Article Writer** (`personalize-article-writer`): sets everything up for your brand and your CMS.
 

@@ -5,7 +5,7 @@ description: "Set up or update the article writer skills for a brand: collect po
 
 # Personalize Article Writer
 
-Make the article writer skills the user's own, through conversation. The output is one brand settings document, titled "Article writer brand settings", built from `assets/brand-settings-template.md` and saved where the user chooses. The skills write-rich-article, fact-check-article, add-external-links, add-internal-links, create-cms-draft and link-old-posts-to-new-article read it at the start of every run.
+Make the article writer skills the user's own, through conversation. The output is one brand settings document, titled "Article writer brand settings", built from `assets/brand-settings-template.md` and saved where the user chooses. The skills write-rich-article, fact-check-seo-article, add-article-external-links, add-article-internal-links, create-article-cms-draft and link-old-posts-to-new-article read it at the start of every run.
 
 The user never edits a file: they answer, share what they have, and correct a draft. Never change any skill's own files.
 
@@ -73,7 +73,7 @@ Read the website's homepage and product pages, and the sitemap (`<website>/sitem
 
 Skip to Phase 4 if the user has no CMS connector; record the CMS name and leave the rest of the CMS section `Not set`.
 
-Otherwise walk through Step 0 of the create-cms-draft skill with the user, using its Prismic guide for Prismic or its guide to other CMSs for anything else:
+Otherwise walk through Step 0 of the create-article-cms-draft skill with the user, using its Prismic guide for Prismic or its guide to other CMSs for anything else:
 
 1. List the sites, spaces or repositories and confirm the live one. Never use one named or described as staging, sandbox, test or dev.
 2. Find the blog post type and read its fields: title, slug, body, SEO fields, author, category, date, tags, and any summary, FAQ, related-posts or call-to-action fields or blocks.

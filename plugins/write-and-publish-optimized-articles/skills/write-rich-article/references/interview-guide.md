@@ -34,7 +34,7 @@ What can this company say that nobody else can? Internal data, a repeated patter
 What does the user believe that they cannot prove yet? These are often the most interesting sentences in an article, and they are safe as long as they are framed as a position rather than a fact. Ask for it explicitly, and confirm it can be labelled as a prediction or an opinion.
 
 ### 4. The honest limitation (1 question)
-Where does the brand's product genuinely not fit, and how bluntly can that be said? The playbook requires naming at least one limitation. Getting the user's own version means it will be specific rather than defanged.
+Where does the brand's product genuinely not fit, and how bluntly can that be said? The honesty rule in the writing standards requires naming at least one limitation. Getting the user's own version means it will be specific rather than defanged.
 
 ### 5. Constraints (1 question)
 Claims to avoid, competitors not to name, legal or positioning red lines, anything the company has publicly said it will not do. Cheaper to ask now than to unpick after the draft.

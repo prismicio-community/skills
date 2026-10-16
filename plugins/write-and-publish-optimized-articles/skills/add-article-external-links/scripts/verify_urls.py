@@ -14,6 +14,7 @@ Checks, per URL:
 Exit code 1 if any URL fails. Standard library only.
 """
 
+import argparse
 import re
 import sys
 import urllib.request
@@ -37,7 +38,13 @@ def check(url):
 
 
 def main():
-    src = sys.stdin if sys.argv[1:] == ["-"] else open(sys.argv[1])
+    ap = argparse.ArgumentParser(description="Check candidate link URLs: status, redirects, robots meta and title.")
+    ap.add_argument("file", help="a text file with one URL per line, or - to read from standard input")
+    args = ap.parse_args()
+    try:
+        src = sys.stdin if args.file == "-" else open(args.file, encoding="utf-8")
+    except OSError as e:
+        ap.error(f"cannot read {args.file}: {e.strerror}")
     urls = [l.strip() for l in src if l.strip() and not l.startswith("#")]
     bad = 0
     for u in urls:

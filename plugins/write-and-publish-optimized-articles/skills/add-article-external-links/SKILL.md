@@ -1,6 +1,6 @@
 ---
-name: add-external-links
-description: "Choose, verify and place 3 to 5 outbound links to primary sources (research, data, official docs) in an article draft, never to competitors, with an approval table before any edit. Use for 'add sources', 'add external links', 'what should this article cite'. For links to the brand's own pages use add-internal-links."
+name: add-article-external-links
+description: "Choose, verify and place 3 to 5 outbound links to primary sources (research, data, official docs) in an article draft, never to competitors, with an approval table before any edit. Use for 'add sources', 'add external links', 'what should this article cite'. For links to the brand's own pages use add-article-internal-links."
 ---
 
 # External Linking
@@ -24,7 +24,7 @@ This skill uses: brand name and direct competitors. A setting marked `Not set`, 
 2. Find the primary source for each.
 3. Verify every URL.
 4. Show the approval table and stop.
-5. Write only the approved rows into the draft, then re-run the article's link checker.
+5. Write only the approved rows into the draft, then verify every placed link again with `scripts/verify_urls.py`.
 
 ## What earns an external link
 

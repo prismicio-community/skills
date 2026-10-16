@@ -9,7 +9,7 @@ Usage:
 Handles front matter (meta_title, meta_description, slug and any other keys),
 the H1 (returned as the title, left out of the body), H2 to H4, paragraphs,
 bold, italic, inline code, links, bulleted and numbered lists, blockquotes and
-tables. Output is plain semantic HTML with no classes or inline styles, which
+tables, fenced code blocks and images. Output is plain semantic HTML with no classes or inline styles, which
 most rich-text and HTML fields accept as-is.
 
 Refuses to emit output if any markdown syntax is left unparsed, so a stray
@@ -23,9 +23,14 @@ import re
 import sys
 
 
+SEP_RE = re.compile(r"^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$")
+
+
 def inline(md):
     out = html.escape(md, quote=False)
     out = re.sub(r"`([^`]+)`", r"<code>\1</code>", out)
+    out = re.sub(r"!\[([^\]]*)\]\(([^)\s]+)\)",
+                 lambda m: f'<img src="{html.escape(html.unescape(m.group(2)))}" alt="{html.escape(html.unescape(m.group(1)))}">', out)
     out = re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)",
                  lambda m: f'<a href="{html.escape(html.unescape(m.group(2)))}">{m.group(1)}</a>', out)
     out = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", out)
@@ -60,6 +65,18 @@ def convert(raw):
         if not s.strip():
             i += 1
             continue
+        fence = re.match(r"^\s*(```|~~~)\s*([\w+-]*)", s)
+        if fence:
+            marker, lang = fence.group(1), fence.group(2)
+            i += 1
+            code = []
+            while i < len(lines) and not lines[i].strip().startswith(marker):
+                code.append(lines[i])
+                i += 1
+            i += 1  # closing fence
+            cls = f' class="language-{lang}"' if lang else ""
+            blocks.append(("c", f"<pre><code{cls}>{html.escape(chr(10).join(code), quote=False)}</code></pre>", "", 0))
+            continue
         h = re.match(r"^(#{1,4})\s+(.*)", s)
         if h:
             level = len(h.group(1))
@@ -69,7 +86,7 @@ def convert(raw):
                 blocks.append(("h", f"<h{level}>{inline(h.group(2).strip())}</h{level}>", h.group(2).strip(), level))
             i += 1
             continue
-        if s.lstrip().startswith("|") and i + 1 < len(lines) and re.match(r"^\s*\|?\s*:?-{2,}", lines[i + 1]):
+        if s.lstrip().startswith("|") and i + 1 < len(lines) and SEP_RE.match(lines[i + 1]):
             head = cells(s)
             i += 2
             rows = []
@@ -97,8 +114,9 @@ def convert(raw):
                 i += 1
             blocks.append(("q", f"<blockquote><p>{inline(' '.join(quote))}</p></blockquote>", "", 0))
             continue
-        para = []
-        while i < len(lines) and lines[i].strip() and not re.match(r"^(#{1,4}\s|\s*([-*+]|\d+[.)])\s|>|\s*\|)", lines[i]):
+        para = [s.strip()]  # always consume this line, so no input can stall the loop
+        i += 1
+        while i < len(lines) and lines[i].strip() and not re.match(r"^(#{1,4}\s|\s*([-*+]|\d+[.)])\s|>|\s*\||\s*(```|~~~))", lines[i]):
             para.append(lines[i].strip())
             i += 1
         blocks.append(("p", f"<p>{inline(' '.join(para))}</p>", "", 0))
@@ -106,7 +124,8 @@ def convert(raw):
 
 
 def check(fragment):
-    text = re.sub(r"<[^>]+>", "", fragment)
+    text = re.sub(r"<pre>.*?</pre>", "", fragment, flags=re.S)
+    text = re.sub(r"<[^>]+>", "", text)
     problems = []
     if re.search(r"\*\*|\[[^\]]+\]\(|(?<!\w)__\w", text):
         problems.append("unparsed markdown left in the output")

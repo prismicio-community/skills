@@ -1,6 +1,6 @@
 ---
-name: add-internal-links
-description: "Choose, verify and place 4 to 8 links from an article draft to live, indexable pages on the brand's own site, found through the CMS connector or the sitemap, with an approval table before any edit. Use for 'add internal links', 'which of our pages should this link to'. For outbound sources use add-external-links; for links from old posts to a new one use link-old-posts-to-new-article."
+name: add-article-internal-links
+description: "Choose, verify and place 4 to 8 links from an article draft to live, indexable pages on the brand's own site, found through the CMS connector or the sitemap, with an approval table before any edit. Use for 'add internal links', 'which of our pages should this link to'. For outbound sources use add-article-external-links; for links from old posts to a new one use link-old-posts-to-new-article."
 ---
 
 # Internal Linking
@@ -21,7 +21,7 @@ This skill uses: brand name, website, sitemap, CMS and its connector, and the si
 2. Map the draft's reader intents to destinations.
 3. Verify every URL, including robots meta.
 4. Show the approval table and stop.
-5. Write only the approved rows, then re-run the article's link checker.
+5. Write only the approved rows, then verify every placed link again with `scripts/verify_urls.py`.
 
 ## Step 1: inventory, never memory
 
@@ -59,7 +59,7 @@ Priority when choices compete: commercially relevant product and use-case pages 
 ## Rules that override placement
 
 - **The naturalness test.** A link is added only where the text already reaches for it. If a sentence must be written so a link can exist, the link is rejected. Linkifying an existing phrase always beats adding a sentence.
-- **Product and audience separation.** Never link pages that frame the brand through a product category the article deliberately avoids. A GEO article does not link CMS-positioned pages, however strong they are, because the destination's framing undoes the article's.
+- **Product and audience separation.** Never link pages that frame the brand through a product category the article deliberately avoids. An article for one product's buyers does not link pages that present the brand as a different product, however strong they are, because the destination's framing undoes the article's.
 - **No homepage links on the brand name.** Readers know where the homepage is. The brand's navigational link is the product or use-case page that fits the article's reader.
 - **Anchor variety.** Under 8 words, descriptive, and varied: if the site already links a destination with one anchor, use different wording here. Identical anchors repeated across the site toward one page read as manipulation.
 - **One link per destination per article.**

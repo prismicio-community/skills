@@ -9,15 +9,15 @@ A good shot list is an hour of someone's time. A vague one is a meeting.
 One numbered entry per shot:
 
 ```
-SHOT 3 — Peec AI Actions view
-URL / screen:  app.peec.ai → Actions tab, any tracked project
+SHOT 3 — Tool B work-queue view
+URL / screen:  app.tool-b.example → work queue, any project
 Must show:     the opportunity list with gap scores visible, at least 5 rows
 Must not show: account name, billing, teammate names, customer domains
 Viewport:      1440 x 900, light mode, browser chrome cropped out
-Supports:      the claim that Peec turns citations into a scored work queue
+Supports:      the claim that Tool B turns citations into a scored work queue
 Caption:       "Cited sources clustered into owned and earned opportunities,
                 scored by gap size, which is what turns a score into a queue"
-Alt text:      "Peec AI Actions view listing content opportunities ranked by
+Alt text:      "Tool B work-queue view listing content opportunities ranked by
                 the size of the visibility gap"
 Capture date:  record on capture
 ```

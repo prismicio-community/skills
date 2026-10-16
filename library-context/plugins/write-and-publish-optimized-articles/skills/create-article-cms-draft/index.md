@@ -1,5 +1,5 @@
 ---
-title: Create CMS Draft
+title: Create Article CMS Draft
 summary: Turn any finished article into an unpublished blog post draft in your CMS, mapped onto your own blog structure.
 description: A free AI skill that creates a finished article as an unpublished blog draft in your CMS, with links, related posts and a CTA. Prismic recommended.
 categories: [content]

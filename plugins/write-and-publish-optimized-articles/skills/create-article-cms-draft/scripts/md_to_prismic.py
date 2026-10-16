@@ -15,11 +15,12 @@ Emits, in document order:
   - meta            front-matter mapped to blog fields
   - tldr            the first bulleted section (TL;DR / "the short version")
   - text_content    prose between tables
-  - comparison_table markdown tables, as the `multicolumn` variation
+  - comparison_table markdown tables
   - faq             the FAQ section, as repeatable items
 
-Slice and field names default to a reference blog model (tldr, text_content,
-comparison_table, faq). Pass --map content-model.json to rename them to the
+Slice and field names are placeholders (tldr, text_content, comparison_table,
+faq, and fields title, content, table, question, answer). Always pass the
+repository's own content map: they almost never match a real blog type. Pass --map content-model.json to rename them to the
 repository's own slice types, variations and field ids, or to fold a slice the
 repository does not have into plain rich text (map it to null):
 
@@ -144,6 +145,24 @@ def table_payload(rows):
     return {"__TYPE__": "TableContent", "content": out}
 
 
+def faq_question(line):
+    """Return the question text if this line starts an FAQ item, else None.
+
+    Accepts ### or #### headings, "Q:" or "**Q:**" lines, and lines that are
+    wholly bold and end with a question mark.
+    """
+    m = re.match(r"^#{3,4}\s+(.*)$", line)
+    if m:
+        return m.group(1).strip()
+    m = re.match(r"^\s*(\*\*)?Q\s*[:.]\s*(\*\*)?\s*(.+?)\s*(\*\*)?\s*$", line)
+    if m:
+        return m.group(3).strip().strip("*").strip()
+    m = re.match(r"^\s*\*\*(.+\?)\*\*\s*$", line)
+    if m:
+        return m.group(1).strip()
+    return None
+
+
 def line_to_block(s):
     h = re.match(r"^(#{2,6})\s+(.*)$", s)
     if h:
@@ -163,7 +182,6 @@ def convert(raw):
     lines = body.split("\n")
 
     parts, buf, i = [], [], 0
-    in_fence = False
     current_h2 = ""
 
     def flush(kind="text_content"):
@@ -174,11 +192,17 @@ def convert(raw):
 
     while i < len(lines):
         s = lines[i]
-        if s.strip().startswith("```"):
-            in_fence = not in_fence
-            i += 1
+        fence = re.match(r"^\s*(```|~~~)", s)
+        if fence:
+            marker, code, j = fence.group(1), [], i + 1
+            while j < len(lines) and not lines[j].strip().startswith(marker):
+                code.append(lines[j])
+                j += 1
+            buf.append({"type": "preformatted", "direction": "ltr",
+                        "content": {"text": "\n".join(code), "spans": []}})
+            i = j + 1
             continue
-        if in_fence or not s.strip():
+        if not s.strip():
             i += 1
             continue
 
@@ -204,19 +228,23 @@ def convert(raw):
                 continue
             if FAQ_HEADINGS.search(current_h2):
                 flush()
-                items, j, q, ans = [], i + 1, None, []
+                items, j, q, ans, content_lines = [], i + 1, None, [], 0
                 while j < len(lines) and not re.match(r"^##\s", lines[j]):
-                    hq = re.match(r"^#{3,4}\s+(.*)$", lines[j])
-                    if hq:
+                    line = lines[j]
+                    if line.strip():
+                        content_lines += 1
+                    question = faq_question(line)
+                    if question is not None:
                         if q:
                             items.append((q, ans))
-                        q, ans = hq.group(1).strip(), []
-                    elif lines[j].strip() and q:
-                        ans.append(line_to_block(lines[j]))
+                        q, ans = question, []
+                    elif line.strip() and q:
+                        ans.append(line_to_block(re.sub(r"^\s*(\*\*)?A\s*[:.]\s*(\*\*)?\s*", "", line)))
                     j += 1
                 if q:
                     items.append((q, ans))
-                parts.append({"slice": "faq", "title": current_h2, "items": items})
+                parts.append({"slice": "faq", "title": current_h2, "items": items,
+                              "content_lines": content_lines})
                 i = j
                 continue
 
@@ -246,26 +274,24 @@ def convert(raw):
 # ---------------------------------------------------------------- payloads
 
 def payload_for(part):
+    """A shared slice widget, with placeholder field names that --map renames."""
     kind = part["slice"]
     if kind == "tldr":
-        return {"variation": "default", "primary": {
-            "title": rich([block("heading2", part["title"])]),
-            "content": rich(part["blocks"])}, "items": []}
-    if kind == "text_content":
-        return {"variation": "default",
-                "primary": {"content": rich(part["blocks"])}, "items": []}
-    if kind == "comparison_table":
-        return {"variation": "multicolumn", "primary": {
-            "table": table_payload(part["rows"]),
-            "highlight_first_column": {"__TYPE__": "BooleanContent", "value": True}},
-            "items": []}
-    if kind == "faq":
-        return {"variation": "default",
-                "primary": {"title": rich([block("heading2", part["title"])])},
-                "items": [{"__TYPE__": "GroupItemContent", "value": [
-                    ["question", rich([block("heading3", q)])],
-                    ["answer", rich(a)]]} for q, a in part["items"]]}
-    return None
+        primary, items = {"title": rich([block("heading2", part["title"])]),
+                          "content": rich(part["blocks"])}, []
+    elif kind == "text_content":
+        primary, items = {"content": rich(part["blocks"])}, []
+    elif kind == "comparison_table":
+        primary, items = {"table": table_payload(part["rows"])}, []
+    elif kind == "faq":
+        primary = {"title": rich([block("heading2", part["title"])])}
+        items = [{"__TYPE__": "GroupItemContent", "value": [
+            ["question", rich([block("heading3", q)])],
+            ["answer", rich(a)]]} for q, a in part["items"]]
+    else:
+        return None
+    return {"__TYPE__": "SharedSliceContent", "variation": "default",
+            "primary": primary, "items": items}
 
 
 META_MAP = {"meta_title": "meta_title", "meta_description": "meta_description",
@@ -334,6 +360,9 @@ def validate(parts):
     """Catch the failure modes that silently produce broken documents."""
     problems = []
     for n, part in enumerate(parts):
+        if part["slice"] == "faq" and part.get("content_lines") and not part["items"]:
+            problems.append(f"part {n}: FAQ section has text but no questions were recognised; "
+                            "write each question as a ### heading, a Q: line, or a bold line ending in ?")
         for b in part.get("blocks", []) + [x for _, a in part.get("items", []) for x in a]:
             t = b.get("content", {}).get("text", "")
             for sp in b.get("content", {}).get("spans", []):
@@ -352,6 +381,8 @@ def main():
     ap.add_argument("--map", help="JSON file mapping slices and fields to the repository's model")
     args = ap.parse_args()
     cmap = json.load(open(args.map, encoding="utf-8")) if args.map else None
+    if cmap is None and not args.list:
+        print("NOTE: no --map given; slice and field names are placeholders, not your model's.", file=sys.stderr)
 
     fm, parts = convert(open(args.path, encoding="utf-8").read())
 

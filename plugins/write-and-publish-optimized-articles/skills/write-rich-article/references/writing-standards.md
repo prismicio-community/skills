@@ -13,9 +13,9 @@ Copy these into any brief handed to another writer or model, without paraphrasin
 - **Headings:** navigational, not structural labels. No numeric prefixes on section headings, though numbered entry headings (H3/H4) are correct in listicles. No hierarchy skips. Never deeper than H4. No heading that only restates the H1.
 - **Tables:** maximum 5 columns.
 - **Internal links:** 4 to 8, with descriptive anchor text. Never "click here", "read more", or "here".
-- **External links:** 2 to 4, to primary authoritative sources only. No competitor marketing pages. No aggregators where a primary source exists.
+- **External links:** 3 to 5, to primary authoritative sources only. No links to competitors' domains. No aggregators where a primary source exists.
 - **Sourcing:** every statistic, percentage, count, price, date, named study, or figure carries a source link or explicit in-text attribution. Cite primary sources. No leftover writer notes in the final article.
-- **TL;DR:** first section, 4 to 10 real-takeaway bullets, summarizing the whole article rather than teasing it.
+- **TL;DR:** first section, 4 to 6 real-takeaway bullets, summarizing the whole article rather than teasing it.
 - **FAQ:** last content section, 5 to 10 real-user questions, answers 2 to 5 sentences, direct and non-evasive.
 - **No em dashes.** See below.
 - **No AI-cliché phrasing or structure.** See below.
@@ -100,9 +100,9 @@ Every specific claim in the draft gets an entry in the sourcing ledger: claim, s
 
 ## Product and audience separation
 
-**Write about the product the article is about.** When a company sells several things, an article aimed at one audience must not describe the brand through another product's category. A GEO article that calls the brand a headless CMS invites every reader who uses a different CMS to disqualify it on the spot, even when the product works alongside whatever they already run.
+**Write about the product the article is about.** When a company sells several things, an article aimed at one audience must not describe the brand through another product's category. If a company sells a project tracker and a documentation tool, an article for documentation buyers that calls the brand a project tracker invites every reader who already has one to disqualify it on the spot, even when the documentation tool works alongside whatever they run.
 
-Name the capability rather than the category the company is filed under. "Publishes the pages itself, built the way AI systems prefer to read them" survives; "headless CMS with API-first delivery" does not.
+Name the capability rather than the category the company is filed under. "Turns meeting notes into assigned tasks" survives; "AI-powered productivity platform" does not.
 
 **Match vocabulary to the reader.** A marketing audience abandons technical writing quickly, and the terms that read as precision to an engineer read as someone else's job to a marketer. Translate rather than simplify: keep the substance and drop the implementation.
 
@@ -147,9 +147,9 @@ Four things to look for, and cut on sight:
 
 Run it as a deletion pass, not an editing pass. Ask of each brand mention whether the article gets worse without it, and cut where the answer is no. Removing a section will usually orphan a summary bullet or a cross-reference elsewhere, so re-read the whole piece afterwards rather than only the gap.
 
-`scripts/lint_article.py --brand <name>` reports brand mention density and flags brand mentions in sections that are not the brand's own, which makes the pass quick.
+`scripts/lint_article.py --brand <name>` reports brand mention density as information (not as a problem) and flags brand mentions in sections that are not the brand's own, which makes the pass quick.
 
-**Name the whole capability.** The most common way a brand gets undersold is omission, not modesty. Before finalising an entry, check the product's own pages and sales calls for capabilities the draft left out. A tool that reads visibility data, decides what to build, writes it and publishes it should not be described only as a publishing tool.
+**Name the whole capability.** The most common way a brand gets undersold is omission, not modesty. Before finalising an entry, check the product's own pages and sales calls for capabilities the draft left out. A tool that plans, writes and publishes should not be described only as a publishing tool.
 
 **Answer the disqualifying objection in the category, not in the entry.** If readers might assume they must replace their stack to use the brand, say plainly that they do not, and place it where it covers the whole category rather than inside the brand's own entry, where it reads as defensive.
 
@@ -197,7 +197,7 @@ Any rule here can be broken if breaking it clearly serves the reader better. Say
 **Entries (listicles and comparisons)**
 - Every named product has its own numbered entry, none grouped under a shared heading
 - Every entry states what it does, its standout capability, who it is for, and a limitation
-- Entry lengths within roughly 1.5x of each other, brand included
+- Entry lengths within roughly 2x of each other, brand included
 - Primary keyword present in category headings
 
 **Language**
@@ -220,7 +220,7 @@ Any rule here can be broken if breaking it clearly serves the reader better. Say
 - Captions say what to notice, not what the image is
 
 **Links and metadata**
-- 4 to 8 internal links, 2 to 4 external, all verified 200, all with descriptive anchors
+- 4 to 8 internal links, 3 to 5 external, all verified 200, all with descriptive anchors
 - Every user-supplied link placed or explicitly reported as unplaced
 - Meta title under 60 characters, meta description 140 to 160, slug keyword-first
 - 5 to 10 FAQs, one positioning the brand with a caveat

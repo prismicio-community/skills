@@ -1,5 +1,5 @@
 ---
-name: create-cms-draft
+name: create-article-cms-draft
 description: "Turn a finished article into an unpublished blog post draft in the user's CMS through its connector, mapped onto their blog post type with author, category, related posts, a call to action and SEO fields. Never publishes. Prismic is recommended; other CMSs are verified with a test draft first. Use for 'put this in the CMS', 'create a blog draft', 'stage this for review'."
 ---
 
@@ -19,7 +19,17 @@ This skill holds no brand details. They live in a brand settings document the us
 
 This skill uses: brand name, website, and everything in the CMS section: the CMS and its connector, the live site, space or repository, the blog post type, author and category, body format, how drafts stay unpublished, whether edits to published posts can be staged, the call-to-action destination, draft naming, whether a test draft was verified, and the content model map. A setting marked `Not set`, or missing, means: ask the user at the step that uses it. Wherever this file says "the brand settings", it means that document, and "the brand" means the brand it describes.
 
-The content model map is a small JSON block in the brand settings that says which field or block of the blog post type each part of an article goes into; `null` means the model has no matching part, so it is folded into the main body. Its format is in `scripts/md_to_prismic.py`'s docstring.
+The content model map is a small JSON block in the brand settings that says which slice or block, and which fields, of the blog post type each part of an article goes into; `null` means the model has no matching part, so it is folded into the main body. For a CMS other than Prismic, record the field or block names the same way. Its shape:
+
+```json
+{"slices": {
+   "tldr": {"type": "summary", "variation": "default",
+            "fields": {"title": "heading", "content": "body"}},
+   "text_content": {"type": "rich_text", "fields": {"content": "text"}},
+   "comparison_table": null,
+   "faq": {"type": "faq", "fields": {"title": "title", "question": "question", "answer": "answer"}}},
+ "meta": {"meta_title": "seo_title", "meta_description": "seo_description"}}
+```
 
 ## When there is no CMS connector
 

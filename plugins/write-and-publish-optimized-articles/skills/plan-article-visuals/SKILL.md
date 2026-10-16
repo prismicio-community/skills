@@ -59,22 +59,22 @@ Output is SVG: it scales, stays sharp, and stays editable. For anything more com
 To check the result, rasterize and look at it. Do not ship a diagram you have not seen:
 
 ```bash
-pip install cairosvg --break-system-packages -q
 python -c "import cairosvg; cairosvg.svg2png(url='out.svg', write_to='out.png', scale=1.2)"
 ```
 
-Then `view` the PNG. Text overflow and collisions are obvious visually and invisible in the source.
+This needs the `cairosvg` package (see Compatibility). If it isn't installed and the user hasn't approved installing it, open the SVG itself instead. Then open the image and look at it. Text overflow and collisions are obvious visually and invisible in the source.
 
 ## Step 4: specify what cannot be made
 
 Write the numbered shot list first, precise enough that it can be worked through without asking questions. Read `references/shot-list.md` for the format and the legal points. Then split it in two.
 
-**Public pages** (pricing, docs, marketing sites, anything reachable without a login) can be captured with Playwright:
+**Public pages** (pricing, docs, marketing sites, anything reachable without a login) can be captured with `scripts/capture_shots.py`, where the client can run a headless browser (see Compatibility):
 
 ```bash
-pip install playwright && python -m playwright install chromium
 python scripts/capture_shots.py shots.json --out ./images
 ```
+
+If Playwright and its browser aren't installed, say so and treat every shot as a hand-off; don't install software on the user's machine without asking.
 
 It hides cookie banners and chat widgets, supports cropping to an element, and writes a `manifest.json` with the capture date, final URL and viewport for every shot. Add `--insecure` only inside a sandbox behind a TLS-intercepting proxy, never on an untrusted network.
 
@@ -101,4 +101,5 @@ Never show another company's customer data, and blur account identifiers in your
 ## Compatibility
 
 - **Scripts** (`scripts/make_diagram.py`, `scripts/capture_shots.py`): need a client that can run Python. Without one, deliver the diagram specs and the shot list for someone else to produce.
+- **Optional packages, installed only with the user's approval:** `cairosvg` to render diagrams to PNG for checking, and Playwright with a Chromium download (`pip install playwright`, then `python -m playwright install chromium`) for capturing public pages. Prefer a virtual environment; never override the system's package protections. Without them, check the SVG directly and hand every screenshot off.
 - No connectors needed.

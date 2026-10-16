@@ -7,7 +7,7 @@ Usage:
 
 Reports per link: HTTP status, final URL after redirects, internal/external
 classification, anchor warnings. Also checks the counts required by the
-playbook (4 to 8 internal, 2 to 4 external) and flags duplicate destinations.
+writing standards (4 to 8 internal, 3 to 5 external) and flags duplicate destinations.
 
 Exits 1 if any link is broken or any count is out of range.
 Standard library only.
@@ -34,7 +34,7 @@ STOPWORDS = {"the", "a", "an", "and", "or", "of", "to", "in", "for", "on",
              "guide", "docs", "doc", "blog", "page", "www", "com", "io"}
 
 INTERNAL_MIN, INTERNAL_MAX = 4, 8
-EXTERNAL_MIN, EXTERNAL_MAX = 2, 4
+EXTERNAL_MIN, EXTERNAL_MAX = 3, 5
 
 
 class RecordingRedirectHandler(urllib.request.HTTPRedirectHandler):

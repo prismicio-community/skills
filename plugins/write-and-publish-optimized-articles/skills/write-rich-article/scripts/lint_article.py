@@ -177,6 +177,15 @@ class Report:
     def errors(self):
         return [i for i in self.items if i["level"] == "ERROR"]
 
+    @property
+    def warnings(self):
+        return [i for i in self.items if i["level"] == "WARN"]
+
+    @property
+    def problems(self):
+        """Errors and warnings. INFO items are reported but never block a clean result."""
+        return [i for i in self.items if i["level"] in ("ERROR", "WARN")]
+
 
 def check_dashes(parsed, rep):
     for no, text in prose_lines(parsed):
@@ -252,7 +261,7 @@ def check_headings(parsed, rep):
         if level > 1 and text.lower().strip() == h1_text:
             rep.add("ERROR", "headings", no, "Heading exactly restates the H1.", text)
         if level == 2 and text.strip().lower() in {"introduction", "overview", "conclusion",
-                                                   "summary", "background", "final thoughts"}:
+                                                   "summary", "background"}:
             rep.add("WARN", "headings", no,
                     "Structural label rather than a navigational heading.", text)
         prev_level = level
@@ -326,9 +335,9 @@ def check_tldr_and_faq(parsed, rep, headings):
         end_line = headings[tldr_idx + 1][0] if tldr_idx + 1 < len(headings) else 10 ** 9
         bullets = [t for no, t in prose_lines(parsed)
                    if start_line < no < end_line and re.match(r"^\s*[-*]\s+", t)]
-        if not 4 <= len(bullets) <= 10:
+        if not 4 <= len(bullets) <= 6:
             rep.add("ERROR", "tldr", start_line,
-                    f"TL;DR has {len(bullets)} bullets. Required: 4 to 10.")
+                    f"TL;DR has {len(bullets)} bullets. Required: 4 to 6.")
         covered = sum(1 for b in bullets if len(strip_markdown(b).split()) >= 12)
         if bullets and covered < len(bullets) * 0.6:
             rep.add("WARN", "tldr", start_line,
@@ -523,12 +532,12 @@ def main():
         print(json.dumps({"word_count": wc, "findings": rep.items}, indent=2))
         return 1 if rep.errors else 0
 
-    by_rule = Counter(i["rule"] for i in rep.items)
+    by_rule = Counter(i["rule"] for i in rep.problems)
     print(f"Article: {args.path}")
     print(f"Approximate word count: {wc}")
-    print(f"Findings: {len(rep.errors)} errors, {len(rep.items) - len(rep.errors)} warnings\n")
+    print(f"Findings: {len(rep.errors)} errors, {len(rep.warnings)} warnings\n")
 
-    for level in ("ERROR", "WARN"):
+    for level in ("ERROR", "WARN", "INFO"):
         items = [i for i in rep.items if i["level"] == level]
         if not items:
             continue
@@ -543,8 +552,8 @@ def main():
     if by_rule:
         print("Counts by rule:", ", ".join(f"{k}={v}" for k, v in by_rule.most_common()))
 
-    if not rep.items:
-        print("Clean. No findings.")
+    if not rep.problems:
+        print("Clean. No errors or warnings." + (" Information lines above are for reference." if rep.items else ""))
 
     return 1 if rep.errors else 0
 

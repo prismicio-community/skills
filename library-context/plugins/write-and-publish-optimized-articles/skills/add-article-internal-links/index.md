@@ -1,5 +1,5 @@
 ---
-title: Add Internal Links
+title: Add Article Internal Links
 summary: Add 4 to 8 links from an article draft to live, indexable pages on your own site, with your approval first.
 description: A free AI skill that finds, verifies and places internal links from a new article to your existing pages, from your CMS or sitemap.
 categories: [seo, content]

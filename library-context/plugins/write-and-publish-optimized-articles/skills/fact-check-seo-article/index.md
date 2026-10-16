@@ -1,5 +1,5 @@
 ---
-title: Fact-check Article
+title: Fact-check SEO Article
 summary: Verify every claim and piece of advice in an article, check claims about your brand against your positioning, and get the fixes.
 description: A free AI skill that fact-checks every claim and piece of advice in an article against real sources, then suggests surgical edits.
 categories: [content]
@@ -18,7 +18,7 @@ requirements:
 examples:
   - prompt: Fact-check this article.
     note: Paste the article or share a link. Works on anything, written by anyone.
-  - prompt: Is this accurate? Check every claim and the advice too.
+  - prompt: Is this article accurate? Check every claim and the advice too.
     note: The same check, phrased as a question.
 ---
 

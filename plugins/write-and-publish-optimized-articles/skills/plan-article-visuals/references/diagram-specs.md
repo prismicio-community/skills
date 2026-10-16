@@ -51,7 +51,7 @@ One series of comparable numbers. Not for two numbers, which belong in a sentenc
   "title": "Reported entry price per month",
   "subtitle": "Confirm with vendors before budgeting",
   "unit": "$",
-  "bars": [{"label": "Otterly", "value": 29}, {"label": "Peec AI", "value": 95}]
+  "bars": [{"label": "Tool A", "value": 30}, {"label": "Tool B", "value": 90}]
 }
 ```
 
@@ -66,8 +66,7 @@ Write SVG directly, or use matplotlib for statistical plots. Do not distort cont
 ## Always look at the output
 
 ```bash
-pip install cairosvg --break-system-packages -q
 python -c "import cairosvg; cairosvg.svg2png(url='out.svg', write_to='out.png', scale=1.2)"
 ```
 
-Then `view` the PNG. Text overflow, collisions and bad wrapping are obvious on sight and invisible in the source.
+This needs the `cairosvg` package; if it isn't available, open the SVG itself. Then look at the image. Text overflow, collisions and bad wrapping are obvious on sight and invisible in the source.

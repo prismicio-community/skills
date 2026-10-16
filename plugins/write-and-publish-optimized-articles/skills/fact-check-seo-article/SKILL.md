@@ -1,6 +1,6 @@
 ---
-name: fact-check-article
-description: "Fact-check and edit an article: verify every claim and piece of advice against a source actually opened, check claims about the brand against its positioning, docs and website, then give editorial fixes and a marked-up revision. Use for 'fact-check this', 'is this accurate', 'review this article', 'audit this post', or pasted article text. Runs automatically after write-rich-article once the user approves a draft."
+name: fact-check-seo-article
+description: "Fact-check an SEO article or blog post: verify every claim and piece of advice against a source actually opened, check claims about the brand against its positioning, docs and website, then give fixes and a marked-up revision. Use when the user asks to fact-check an article, verify its claims or check whether it is accurate. Runs automatically after write-rich-article once the user approves a draft. Not for general proofreading."
 ---
 
 # Article Analyzer and Editor

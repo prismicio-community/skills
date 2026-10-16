@@ -16,7 +16,7 @@ Spec:
   "type": "categories",
   "title": "GEO tools by job",
   "groups": [{"label": "Tracking", "note": "buy first",
-              "items": ["Peec AI", "Profound", "Otterly"]}, ...]
+              "items": ["Tool A", "Tool B", "Tool C"]}, ...]
 }
 {
   "type": "flow",
@@ -27,7 +27,7 @@ Spec:
   "type": "bars",
   "title": "Entry price per month",
   "unit": "$",
-  "bars": [{"label": "Otterly", "value": 29}, ...]
+  "bars": [{"label": "Tool A", "value": 30}, ...]
 }
 
 Colours are deliberately restrained: one accent, one neutral, plenty of white.
@@ -80,7 +80,7 @@ def categories(spec):
     n = len(groups)
     col_w, gap, pad = 250, 24, 32
     top = 88 if spec.get("title") else 40
-    rows = max(len(g["items"]) for g in groups)
+    rows = max(1, max(len(g["items"]) for g in groups))
     box_h = 70 + rows * 30
     width = pad * 2 + n * col_w + (n - 1) * gap
     height = top + box_h + pad
@@ -182,6 +182,15 @@ def main():
         print(f"Unknown type {kind!r}. Expected one of {', '.join(RENDERERS)}.",
               file=sys.stderr)
         return 1
+
+    key = {"categories": "groups", "flow": "steps", "bars": "bars"}[kind]
+    items = spec.get(key)
+    if not isinstance(items, list) or not items:
+        print(f"A {kind} diagram needs a non-empty \"{key}\" list.", file=sys.stderr)
+        return 1
+    if kind == "categories":
+        for g in items:
+            g.setdefault("items", [])
 
     out = RENDERERS[kind](spec)
     with open(args.out, "w", encoding="utf-8") as fh:

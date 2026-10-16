@@ -20,7 +20,7 @@
   ],
   "skills": "./skills/",
   "interface": {
-    "displayName": "Full Content Creation Workflow (Write & Publish Optimized Articles)",
+    "displayName": "Write and Publish Optimized Articles",
     "shortDescription": "Write, optimize, publish",
     "longDescription": "Write, SEO-optimize and publish articles end to end: research, interview, outline, draft, internal and external links, visuals, a fact-check of every claim, then an unpublished draft in your CMS (Prismic recommended).",
     "developerName": "Prismic",
