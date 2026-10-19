@@ -5,7 +5,7 @@ description: A free AI plugin that researches, writes, fact-checks and SEO-optim
 categories: [content, seo]
 tags: [seo, content-writing, articles, fact-check, internal-links, cms, prismic]
 featured: false
-draft: true
+draft: false
 badge: Prismic recommended
 output: A fact-checked SEO article, then an unpublished draft in your CMS
 platforms: [claude, claude-code]

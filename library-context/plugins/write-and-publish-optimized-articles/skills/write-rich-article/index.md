@@ -5,7 +5,7 @@ description: A free AI skill that researches a keyword, interviews you, and writ
 categories: [content, seo]
 tags: [seo, content-writing, articles, blog-posts, serp-research, fact-check]
 featured: false
-draft: true
+draft: false
 output: A finished markdown article plus a research appendix
 platforms: [claude, claude-code]
 requirements:

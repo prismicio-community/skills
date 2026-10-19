@@ -5,7 +5,7 @@ description: A free AI skill that fact-checks every claim and piece of advice in
 categories: [content]
 tags: [fact-check, editing, content-quality, articles, brand-claims]
 featured: false
-draft: true
+draft: false
 output: A fact-check report and a marked-up revision of the article
 platforms: [claude, claude-code]
 requirements:

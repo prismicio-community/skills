@@ -5,7 +5,7 @@ description: A free AI plugin that builds your company's System of Context, chec
 categories: [content]
 tags: [context, positioning, brand-voice, messaging, fact-checking, content-governance]
 featured: false
-draft: true
+draft: false
 output: A set of documents you own, plus a claim check on every draft
 platforms: [claude, claude-code, chatgpt, codex]
 examples:

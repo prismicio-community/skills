@@ -5,7 +5,7 @@ description: A free AI plugin that generates category-relevant, tagged buyer pro
 categories: [seo, research]
 tags: [ai-visibility, prompt-tracking, geo, aeo, ai-search, peec-ai, profound]
 featured: false
-draft: true
+draft: false
 output: A tagged prompt library, ready to import into your tracking tool
 platforms: [claude, claude-code]
 examples:

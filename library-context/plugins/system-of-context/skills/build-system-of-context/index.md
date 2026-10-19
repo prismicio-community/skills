@@ -5,7 +5,7 @@ description: A free AI skill that builds a System of Context for your company fr
 categories: [content]
 tags: [context, positioning, brand-voice, icp, messaging]
 featured: false
-draft: true
+draft: false
 output: Thirteen pages saved in your document tool
 platforms: [claude, claude-code, chatgpt, codex]
 requirements:

@@ -5,7 +5,7 @@ description: A free AI skill that builds a GEO and AI-search action plan from yo
 categories: [seo]
 tags: [geo, aeo, ai-search, ai-visibility, content-plan, peec-ai]
 featured: false
-draft: true
+draft: false
 badge: Peec AI recommended
 output: An Excel workbook of ranked pages to create or update and outreach targets
 platforms: [claude, claude-code]

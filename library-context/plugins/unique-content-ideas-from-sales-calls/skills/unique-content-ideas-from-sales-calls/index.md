@@ -5,7 +5,7 @@ description: A free AI skill that reads your sales call transcripts in full, tes
 categories: [content, research]
 tags: [content-ideas, sales-calls, call-transcripts, customer-insights, content-strategy]
 featured: false
-draft: true
+draft: false
 badge: Any call recorder
 output: A document of proven insights, customer quotes and article ideas
 platforms: [claude, claude-code]

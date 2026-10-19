@@ -5,7 +5,7 @@ description: A free AI skill that fact-checks marketing drafts against your comp
 categories: [content]
 tags: [fact-checking, content-governance, brand-voice, copy-review]
 featured: false
-draft: true
+draft: false
 output: A report of violations, unsupported and drifted claims, with fixes
 platforms: [claude, claude-code, chatgpt, codex]
 requirements:

@@ -5,7 +5,7 @@ description: A free Claude prompt that builds a live Search Console dashboard of
 categories: [seo]
 tags: [search-console, content-refresh, content-decay, striking-distance, ctr, dashboard]
 featured: false
-draft: true
+draft: false
 badge: Dashboard
 output: Live dashboard with page plans
 platforms: [claude]

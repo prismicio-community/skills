@@ -5,7 +5,7 @@ description: A free AI skill that picks, verifies and places outbound links to r
 categories: [content, seo]
 tags: [external-links, citations, sources, seo, articles]
 featured: false
-draft: true
+draft: false
 output: A link approval table, then the draft with approved links in place
 platforms: [claude, claude-code]
 requirements:

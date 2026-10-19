@@ -5,7 +5,7 @@ description: A free AI skill that finds, verifies and places internal links from
 categories: [seo, content]
 tags: [internal-links, seo, site-architecture, sitemap, articles]
 featured: false
-draft: true
+draft: false
 output: A link approval table, then the draft with approved links in place
 platforms: [claude, claude-code]
 requirements:
