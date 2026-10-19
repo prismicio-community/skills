@@ -5,7 +5,7 @@ description: A free AI skill that loads your company's System of Context before 
 categories: [content]
 tags: [context, positioning, brand-voice, messaging]
 featured: false
-draft: true
+draft: false
 output: Writing grounded in your own approved facts
 platforms: [claude, claude-code, chatgpt, codex]
 requirements:

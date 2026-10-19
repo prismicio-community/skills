@@ -5,7 +5,7 @@ description: A free AI skill that collects your positioning, voice, competitors 
 categories: [content]
 tags: [personalization, brand-settings, setup, cms, prismic]
 featured: false
-draft: true
+draft: false
 output: One brand settings document every run reads, and a verified CMS setup
 platforms: [claude, claude-code]
 requirements:

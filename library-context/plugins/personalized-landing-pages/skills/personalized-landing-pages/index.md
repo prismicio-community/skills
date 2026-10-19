@@ -5,7 +5,7 @@ description: A free AI skill that builds personalized ABM landing pages in Prism
 categories: [content]
 tags: [abm, personalization, landing-pages, prismic, account-based-marketing]
 featured: false
-draft: true
+draft: false
 badge: Prismic
 output: Draft pages in a Prismic release, with the reasoning attached
 platforms: [claude, claude-code]

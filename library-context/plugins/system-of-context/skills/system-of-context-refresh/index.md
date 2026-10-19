@@ -5,7 +5,7 @@ description: A free AI skill that keeps your company's System of Context current
 categories: [content]
 tags: [context, content-governance, positioning, maintenance]
 featured: false
-draft: true
+draft: false
 output: A staleness report and a proposed diff, applied once you approve
 platforms: [claude, claude-code, chatgpt, codex]
 requirements:

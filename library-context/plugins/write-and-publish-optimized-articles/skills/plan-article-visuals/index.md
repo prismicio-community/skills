@@ -5,7 +5,7 @@ description: A free AI skill that plans an article's visuals, draws diagrams and
 categories: [content, design]
 tags: [visuals, diagrams, charts, alt-text, screenshots, articles]
 featured: false
-draft: true
+draft: false
 output: Diagram and chart files, screenshots of public pages, and a shot list
 platforms: [claude, claude-code]
 requirements:

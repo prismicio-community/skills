@@ -5,7 +5,7 @@ description: A free AI skill that adds links from your existing blog posts to a 
 categories: [seo, content]
 tags: [internal-links, interlinking, backlinks, seo, blog, prismic]
 featured: false
-draft: true
+draft: false
 badge: Prismic recommended
 output: Staged link edits in your CMS, or an exact list of edits to make
 platforms: [claude, claude-code]

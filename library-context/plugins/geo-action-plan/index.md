@@ -5,7 +5,7 @@ description: A free AI plugin that turns your AI visibility data into a ranked G
 categories: [seo]
 tags: [geo, aeo, ai-search, ai-visibility, content-plan, peec-ai]
 featured: false
-draft: true
+draft: false
 badge: Peec AI recommended
 output: An Excel workbook of ranked pages to create or update and outreach targets
 platforms: [claude, claude-code]

@@ -5,7 +5,7 @@ description: A free AI skill that writes the buyer prompts to track in Peec AI, 
 categories: [seo, research]
 tags: [ai-visibility, prompt-tracking, geo, aeo, ai-search, buyer-research]
 featured: false
-draft: true
+draft: false
 output: 20 tagged prompts, plus an import-ready list
 platforms: [claude, claude-code]
 requirements:

@@ -5,7 +5,7 @@ description: A free AI skill that creates a finished article as an unpublished b
 categories: [content]
 tags: [cms, publishing, blog, drafts, prismic]
 featured: false
-draft: true
+draft: false
 badge: Prismic recommended
 output: An unpublished blog post draft in your CMS
 platforms: [claude, claude-code]
