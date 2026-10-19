@@ -53,6 +53,11 @@ Run `npm run check` before you finish any change. It validates, builds, and veri
     - A prompt may rely on one assistant's features, such as Claude artifacts. Its page must list where it works in `platforms`. Rules 4 and 8 still apply where they can: name connectors by what they are, and read user data through connectors.
     - Prompts aren't in either marketplace, and the skills CLI must not find them. Never add a `SKILL.md` to `prompts/`.
 
+14. **Nothing ships that a reviewer can't read.** `scripts/validate.mjs` enforces the security rules listed in `CONTRIBUTING.md` (Security checks). Don't weaken a rule to get a change through. Fix the content instead.
+    - Bundled scripts take URLs from the user. A fixed host goes in `SCRIPT_HOSTS`, which a maintainer reviews.
+    - Skills install packages only with the user's approval, preferably in a virtual environment, and never with `--break-system-packages`.
+    - The **Capability summary** workflow (`scripts/pr-summary.mjs`) runs from `main` with `pull_request_target`. It must only read the pull request's diff. Never check out, install, or run pull request code in it.
+
 ## Changing the repository name or marketplace name
 
 - The repository slug lives in `package.json` (`library.repository`), the `repository` field of each `.codex-plugin/plugin.json`, and the install commands in `README.md` and `docs/website-integration.md`.
