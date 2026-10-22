@@ -4,8 +4,7 @@ The library page on the Prismic website reads one file: `library.json`. Every pu
 
 ```
 https://github.com/prismicio-community/skills/releases/download/library/library.json
-https://github.com/prismicio-community/skills/releases/download/library/<skill>.zip
-https://github.com/prismicio-community/skills/releases/download/library/<plugin>.plugin
+https://github.com/prismicio-community/skills/releases/download/library/<plugin>.zip
 https://github.com/prismicio-community/skills/releases/download/library/<prompt>.md
 ```
 
@@ -17,7 +16,7 @@ To build the same file locally, run `npm run build`. It writes to `dist/library.
 
 ```jsonc
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "commit": "3f9c…",                         // the commit it was built from
   "repository": { "slug": "prismicio-community/skills", "url": "https://github.com/prismicio-community/skills", "branch": "main" },
   "marketplace": {
@@ -57,7 +56,7 @@ Plugins, skills, and prompts share most fields:
 | `intro` | string | Markdown before the first section, often empty |
 | `sections` | `{ id, heading, markdown }[]` | One per `## ` heading, in page order. Always includes `how-it-works` and `setup`. Relative links and images are rewritten to absolute URLs. |
 | `paths.source`, `paths.context` | string | Repository paths of the package and its page |
-| `download` | object | `file`, `url`, `bytes`, and `sha256`. Plugins and skills also have `contents` (paths inside the archive). |
+| `download` | object | Plugins and prompts only. `file`, `url`, `bytes`, and `sha256`. Plugins also have `contents` (paths inside the archive). One plugin zip uploads to both Claude and ChatGPT. |
 
 Plugin-only fields:
 
@@ -72,7 +71,7 @@ Skill-only fields:
 
 | Field | Notes |
 | --- | --- |
-| `plugin` | Slug of the plugin that contains it |
+| `plugin` | Slug of the plugin that contains it. Skills have no `download`: link to this plugin's download instead. |
 | `install.skillsCli` | `npx skills add prismicio-community/skills --skill <name>` |
 | `install.viaPlugin` | The containing plugin's `install` object |
 
@@ -85,7 +84,7 @@ Prompt-only fields:
 
 Prompts have no `install` field. Visitors copy `prompt.markdown`, or download the same text from `download.url`.
 
-`schemaVersion` changes only when a field is removed or changes meaning. Fields may be added at any time.
+`schemaVersion` changes only when a field is removed or changes meaning. Fields may be added at any time. Version 2 removed `download` from skills and changed plugin downloads from `.plugin` to `.zip`.
 
 ## Suggested page mapping
 

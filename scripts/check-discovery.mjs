@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Checks the repo with the real tools users install from:
 //   1. skills CLI: lists every skill and no prompt, and installs one skill with its exact files.
-//   2. Claude Code: validates the marketplace and each .plugin download,
+//   2. Claude Code: validates the marketplace and each plugin download,
 //      then adds the marketplace and installs every plugin.
 //   3. Codex: adds the marketplace and installs every plugin.
 // Every tool runs with a throwaway home directory, so your own setup is untouched.
@@ -81,9 +81,9 @@ else {
   record(v.ok ? 'PASS' : 'FAIL', 'claude plugin validate (marketplace)', v.ok ? '' : tail(v.out));
 
   for (const p of plugins) {
-    const file = `${PATHS.dist}/plugins/${p.name}.plugin`;
+    const file = `${PATHS.dist}/plugins/${p.name}.zip`;
     if (!exists(file)) {
-      record('FAIL', `claude plugin validate ${p.name}.plugin`, 'not built; run "npm run build" first');
+      record('FAIL', `claude plugin validate ${p.name}.zip`, 'not built; run "npm run build" first');
       continue;
     }
     const dir = fs.mkdtempSync(path.join(tmp, 'unpacked-'));
@@ -91,8 +91,9 @@ else {
       fs.mkdirSync(path.join(dir, path.dirname(name)), { recursive: true });
       fs.writeFileSync(path.join(dir, name), bytes);
     }
-    const pv = run('claude', ['plugin', 'validate', path.join(dir, p.name), '--strict'], { env });
-    record(pv.ok ? 'PASS' : 'FAIL', `claude plugin validate ${p.name}.plugin`, pv.ok ? '' : tail(pv.out));
+    // The archive holds the plugin's files at its root.
+    const pv = run('claude', ['plugin', 'validate', dir, '--strict'], { env });
+    record(pv.ok ? 'PASS' : 'FAIL', `claude plugin validate ${p.name}.zip`, pv.ok ? '' : tail(pv.out));
   }
 
   const add = run('claude', ['plugin', 'marketplace', 'add', ROOT], { env });

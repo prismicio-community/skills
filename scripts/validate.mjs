@@ -144,8 +144,12 @@ export function validate() {
         if (!i[k]) error(mf, `"interface.${k}" is required.`);
       }
       if (!Array.isArray(i.capabilities) || !i.capabilities.length) error(mf, '"interface.capabilities" must be a list, for example ["Skills"].');
-      if (i.displayName?.length > 30) warn(mf, '"interface.displayName" is over 30 characters and may be cut off in ChatGPT.');
-      if (i.shortDescription?.length > 30) warn(mf, '"interface.shortDescription" is over 30 characters and may be cut off in ChatGPT.');
+      // ChatGPT rejects an uploaded plugin that breaks these limits.
+      if (m.name?.length > 64) error(mf, '"name" must be 64 characters or fewer.');
+      if (i.displayName?.length > 30) error(mf, '"interface.displayName" must be 30 characters or fewer for ChatGPT.');
+      if (i.shortDescription?.length > 30) error(mf, '"interface.shortDescription" must be 30 characters or fewer for ChatGPT.');
+      if (i.longDescription?.length > 4000) error(mf, '"interface.longDescription" must be 4000 characters or fewer for ChatGPT.');
+      for (const k of ['composerIcon', 'logo']) if (!i[k]) error(mf, `"interface.${k}" is required, for example "./assets/icon.svg".`);
       if (i.brandColor && !/^#[0-9A-Fa-f]{6}$/.test(i.brandColor)) error(mf, '"interface.brandColor" must look like "#6E56CF".');
       if (i.defaultPrompt !== undefined) {
         if (!Array.isArray(i.defaultPrompt) || i.defaultPrompt.length > 3) error(mf, '"interface.defaultPrompt" must be a list of up to 3 prompts.');

@@ -58,12 +58,11 @@ Add `--global` to install for your user instead of the current project, and `--a
 
 ### Download the files
 
-Every skill, plugin, and prompt is available as a file on the [library downloads release](https://github.com/prismicio-community/skills/releases/tag/library). The library page links to the same files.
+Every plugin and prompt is available as a file on the [library downloads release](https://github.com/prismicio-community/skills/releases/tag/library). The library page links to the same files.
 
 | File | What to do with it |
 | --- | --- |
-| `<skill>.zip` | **Claude:** go to **Customize → Skills**, select **+**, then **Upload a skill**. Don't rename the zip or the folder inside it. **Claude Code:** unzip it into `~/.claude/skills/`. **Codex:** unzip it into `~/.agents/skills/`. |
-| `<plugin>.plugin` | **Claude:** go to **Customize → Plugins**, select **Add**, then **Upload plugin**. |
+| `<plugin>.zip` | **Claude:** go to **Customize → Plugins**, select **Add**, then **Upload plugin**. **ChatGPT:** upload it as a new plugin under **Plugins**. In a workspace, you need upload permission or an admin role. Don't unzip it first. |
 | `<prompt>.md` | Open it, copy everything, and paste it into a new chat. |
 
 ## Update

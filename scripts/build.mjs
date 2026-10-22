@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Builds the downloads and the website index into dist/:
-//   dist/skills/<skill>.zip       one skill folder, ready to upload to Claude
-//   dist/plugins/<plugin>.plugin  one plugin folder with a generated .claude-plugin/plugin.json
+//   dist/plugins/<plugin>.zip     one plugin's files at the archive root, plus a generated
+//                                 .claude-plugin/plugin.json, ready to upload to Claude or ChatGPT
 //   dist/prompts/<prompt>.md      one prompt, byte for byte
 //   dist/library.json             everything the library page needs
 // Run with: npm run build
@@ -17,7 +17,7 @@ import {
 import { createZip, fileEntry } from './lib/zip.mjs';
 import { validate, report } from './validate.mjs';
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export function build() {
   const result = validate();
@@ -36,7 +36,6 @@ export function build() {
   const taxonomy = parseYaml(readText(PATHS.taxonomy));
 
   fs.rmSync(abs(PATHS.dist), { recursive: true, force: true });
-  fs.mkdirSync(abs(`${PATHS.dist}/skills`), { recursive: true });
   fs.mkdirSync(abs(`${PATHS.dist}/plugins`), { recursive: true });
   fs.mkdirSync(abs(`${PATHS.dist}/prompts`), { recursive: true });
 
@@ -52,10 +51,13 @@ export function build() {
     const entry = claude.plugins.find((e) => e.name === p);
     const codexManifest = readJson(plugin.codexManifest);
 
-    // Plugin download. Claude's "Upload plugin" needs .claude-plugin/plugin.json,
-    // which the repo leaves out (the marketplace entry is the manifest there).
+    // Plugin download, one zip for both apps. Claude's "Upload plugin" needs
+    // .claude-plugin/plugin.json, which the repo leaves out (the marketplace entry
+    // is the manifest there). ChatGPT reads .codex-plugin/plugin.json. ChatGPT
+    // wants the manifests at the archive root and only accepts .zip.
     const claudeManifest = {
       name: p,
+      displayName: codexManifest.interface?.displayName ?? p,
       version: codexManifest.version,
       description: entry.description,
       author: entry.author,
@@ -64,12 +66,12 @@ export function build() {
       license: config.license,
       keywords: codexManifest.keywords ?? [],
     };
-    const pluginEntries = walkFiles(plugin.dir).map((f) => fileEntry(abs(`${plugin.dir}/${f}`), `${p}/${f}`));
+    const pluginEntries = walkFiles(plugin.dir).map((f) => fileEntry(abs(`${plugin.dir}/${f}`), f));
     pluginEntries.push({
-      path: `${p}/.claude-plugin/plugin.json`,
+      path: '.claude-plugin/plugin.json',
       data: Buffer.from(`${JSON.stringify(claudeManifest, null, 2)}\n`),
     });
-    const pluginDownload = writeArchive(`plugins/${p}.plugin`, pluginEntries, downloadBase);
+    const pluginDownload = writeArchive(`plugins/${p}.zip`, pluginEntries, downloadBase);
 
     items.push({
       ...page(contextPath.plugin(p), rawBase),
@@ -83,9 +85,10 @@ export function build() {
       install: pluginInstall(p),
     });
 
+    // Skills have no download of their own. Some depend on sibling skills or
+    // plugin context, so they're installed with their plugin.
     for (const skill of plugin.skills) {
       const s = skill.name;
-      const skillEntries = walkFiles(skill.dir).map((f) => fileEntry(abs(`${skill.dir}/${f}`), `${s}/${f}`));
       items.push({
         ...page(contextPath.skill(p, s), rawBase),
         id: `skill:${s}`,
@@ -93,7 +96,6 @@ export function build() {
         slug: s,
         plugin: p,
         paths: { source: skill.dir, context: contextPath.skill(p, s) },
-        download: writeArchive(`skills/${s}.zip`, skillEntries, downloadBase),
         install: {
           skillsCli: `npx skills add ${config.repository} --skill ${s}`,
           viaPlugin: pluginInstall(p),
@@ -184,8 +186,9 @@ function writeFile(rel, bytes, downloadBase) {
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
     const library = build();
-    for (const item of library.items) console.log(`  ${item.type.padEnd(6)} ${item.download.file.padEnd(32)} ${item.download.bytes} bytes${item.draft ? '  (draft)' : ''}`);
-    console.log(`\n✔ Built ${library.items.length} download(s) and ${PATHS.dist}/library.json`);
+    const downloads = library.items.filter((i) => i.download);
+    for (const item of downloads) console.log(`  ${item.type.padEnd(6)} ${item.download.file.padEnd(40)} ${item.download.bytes} bytes${item.draft ? '  (draft)' : ''}`);
+    console.log(`\n✔ Built ${downloads.length} download(s) and ${PATHS.dist}/library.json`);
   } catch (e) {
     console.error(`\n✖ ${e.message}`);
     process.exit(1);

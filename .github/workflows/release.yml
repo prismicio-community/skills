@@ -42,7 +42,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          # With no plugins, skills, or prompts yet, the dist/<folder>/* globs expand to nothing.
+          # With no plugins or prompts yet, the dist/<folder>/* globs expand to nothing.
           shopt -s nullglob
           TAG=$(node -p "require('./package.json').library.releaseTag")
 
@@ -54,11 +54,11 @@ jobs:
             gh release create "$TAG" --title "Library downloads" --notes "Downloads for the Prismic AI library." --latest
           fi
 
-          gh release upload "$TAG" dist/library.json dist/skills/* dist/plugins/* dist/prompts/* --clobber
+          gh release upload "$TAG" dist/library.json dist/plugins/* dist/prompts/* --clobber
 
-          # Remove downloads for plugins, skills, and prompts that no longer exist.
+          # Remove downloads that are no longer built, such as removed plugins and prompts.
           for asset in $(gh release view "$TAG" --json assets --jq '.assets[].name'); do
-            if [ ! -e "dist/$asset" ] && [ ! -e "dist/skills/$asset" ] && [ ! -e "dist/plugins/$asset" ] && [ ! -e "dist/prompts/$asset" ]; then
+            if [ ! -e "dist/$asset" ] && [ ! -e "dist/plugins/$asset" ] && [ ! -e "dist/prompts/$asset" ]; then
               gh release delete-asset "$TAG" "$asset" --yes
             fi
           done
