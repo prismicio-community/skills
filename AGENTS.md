@@ -5,7 +5,7 @@ Public, agent-agnostic plugins and skills, plus copy-and-paste prompts, distribu
 - **Claude and Claude Code:** the marketplace in `.claude-plugin/marketplace.json`.
 - **ChatGPT and Codex:** the marketplace in `.agents/plugins/marketplace.json`.
 - **skills CLI (skills.sh):** reads `.claude-plugin/marketplace.json` to find the skills nested in each plugin.
-- **Downloads:** `npm run build` packages each skill as `<skill>.zip`, each plugin as `<plugin>.plugin`, and copies each prompt as `<prompt>.md`. CI publishes them with `library.json` to the rolling GitHub release named in `package.json` (`library.releaseTag`).
+- **Downloads:** `npm run build` packages each plugin as `<plugin>.zip`, one file that uploads to both Claude and ChatGPT, and copies each prompt as `<prompt>.md`. Skills have no download of their own, because some depend on sibling skills or plugin context. CI publishes them with `library.json` to the rolling GitHub release named in `package.json` (`library.releaseTag`).
 - **Copy and paste:** the website shows each prompt in `prompts/` with a Copy button. Nothing is installed.
 
 This repository is `prismicio-community/skills`. It's separate from the official `prismicio/skills`, which the Prismic docs reference for building with Prismic. Don't add skills here that overlap with it, or reuse its skill names (such as `prismic`).
@@ -21,7 +21,7 @@ Run `npm run check` before you finish any change. It validates, builds, and veri
 2. **No `.claude-plugin/plugin.json` inside `plugins/<plugin>/`.**
    - Marketplace entries use `"strict": false` with a `skills` list, so the entry is the manifest.
    - Adding a plugin.json makes Claude Code fail with conflicting manifests.
-   - The build generates one inside each `.plugin` download, because Claude's plugin upload requires it.
+   - The build generates one inside each plugin download, because Claude's plugin upload requires it.
 
 3. **Skill names are unique across all plugins.** The skills CLI keeps only the first skill with a given name, and installs land in `.claude/skills/<name>/`.
 

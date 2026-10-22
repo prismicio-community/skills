@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Checks what the build produced, independently of how it was produced:
-// every plugin, skill, and prompt has exactly one download, each download
-// contains exactly the package's files (no website content, no clutter), each
-// prompt download is the prompt file byte for byte, and library.json matches
-// the files on disk.
+// every plugin and prompt has exactly one download and skills have none, each
+// plugin download contains exactly the package's files (no website content, no
+// clutter), each prompt download is the prompt file byte for byte, and
+// library.json matches the files on disk.
 // Run with: npm run build && npm run verify
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import { PATHS, abs, exists, readJson, walkFiles, parseFrontmatter, loadPlugins, loadPrompts } from './lib/repo.mjs';
+import { PATHS, abs, exists, readJson, walkFiles, loadPlugins, loadPrompts } from './lib/repo.mjs';
 import { readZip } from './lib/zip.mjs';
 
 const failures = [];
@@ -59,22 +59,23 @@ for (const plugin of plugins) {
     fail(`plugin:${p}: missing from library.json`);
     continue;
   }
-  const zip = checkDownload(item, `plugins/${p}.plugin`);
+  const zip = checkDownload(item, `plugins/${p}.zip`);
   if (zip) {
-    // Exactly the plugin folder, plus the generated Claude manifest, under one top-level folder.
-    const expected = [...walkFiles(plugin.dir).map((f) => `${p}/${f}`), `${p}/.claude-plugin/plugin.json`];
-    sameSet(`${p}.plugin`, Object.keys(zip), expected);
+    // Exactly the plugin folder's files, plus the generated Claude manifest, at the
+    // archive root, where both Claude and ChatGPT look for their manifests.
+    const expected = [...walkFiles(plugin.dir), '.claude-plugin/plugin.json'];
+    sameSet(`${p}.zip`, Object.keys(zip), expected);
     for (const [path, bytes] of Object.entries(zip)) {
-      const src = path.slice(p.length + 1);
-      if (src !== '.claude-plugin/plugin.json' && !Buffer.from(bytes).equals(fs.readFileSync(abs(`${plugin.dir}/${src}`)))) {
-        fail(`${p}.plugin: ${path} differs from the source file`);
+      if (path !== '.claude-plugin/plugin.json' && !Buffer.from(bytes).equals(fs.readFileSync(abs(`${plugin.dir}/${path}`)))) {
+        fail(`${p}.zip: ${path} differs from the source file`);
       }
     }
-    const manifest = zip[`${p}/.claude-plugin/plugin.json`];
+    if (!zip['.codex-plugin/plugin.json']) fail(`${p}.zip: .codex-plugin/plugin.json is missing from the archive root`);
+    const manifest = zip['.claude-plugin/plugin.json'];
     if (manifest) {
       const m = JSON.parse(decode(manifest));
-      if (m.name !== p) fail(`${p}.plugin: .claude-plugin/plugin.json has name "${m.name}"`);
-      if ('skills' in m) fail(`${p}.plugin: .claude-plugin/plugin.json must not list skills (they load from skills/)`);
+      if (m.name !== p) fail(`${p}.zip: .claude-plugin/plugin.json has name "${m.name}"`);
+      if ('skills' in m) fail(`${p}.zip: .claude-plugin/plugin.json must not list skills (they load from skills/)`);
     }
   }
   sameSet(`plugin:${p} skills`, item.skills, plugin.skills.map((s) => s.name));
@@ -87,13 +88,8 @@ for (const plugin of plugins) {
       continue;
     }
     if (sitem.plugin !== p) fail(`skill:${s}: library.json says plugin "${sitem.plugin}", expected "${p}"`);
-    const szip = checkDownload(sitem, `skills/${s}.zip`);
-    if (!szip) continue;
-    // Claude's skill upload wants the skill folder at the top of the zip, named like the skill.
-    sameSet(`${s}.zip`, Object.keys(szip), walkFiles(skill.dir).map((f) => `${s}/${f}`));
-    const md = szip[`${s}/SKILL.md`];
-    if (!md) fail(`${s}.zip: ${s}/SKILL.md is missing`);
-    else if (parseFrontmatter(decode(md)).data?.name !== s) fail(`${s}.zip: SKILL.md name does not match the folder`);
+    // Skills ship only inside their plugin.
+    if ('download' in sitem) fail(`skill:${s}: skills must not have a download; they ship in ${p}.zip`);
   }
 }
 
@@ -117,7 +113,8 @@ const knownIds = new Set([
   ...prompts.map((p) => `prompt:${p.name}`),
 ]);
 for (const item of library.items) if (!knownIds.has(item.id)) fail(`${item.id}: in library.json but not in plugins/ or prompts/`);
-if (new Set(library.items.map((i) => i.download.file)).size !== library.items.length) fail('two downloads share a file name');
+const downloadFiles = library.items.filter((i) => i.download).map((i) => i.download.file);
+if (new Set(downloadFiles).size !== downloadFiles.length) fail('two downloads share a file name');
 
 const built = walkFiles(PATHS.dist);
 sameSet('dist/', built, [...expectedFiles]);
@@ -126,4 +123,4 @@ if (failures.length) {
   console.error(`✖ Package check failed:\n${failures.map((f) => `  - ${f}`).join('\n')}`);
   process.exit(1);
 }
-console.log(`✔ Packages verified: ${library.items.length} download(s) match the source folders and library.json.`);
+console.log(`✔ Packages verified: ${downloadFiles.length} download(s) match the source folders and library.json.`);
