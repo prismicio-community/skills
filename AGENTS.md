@@ -41,7 +41,7 @@ Run `npm run check` before you finish any change. It validates, builds, and veri
    - Card copy, screenshots, cover images, and install instructions belong in `library-context/`.
    - No README files inside skills.
 
-10. **Every plugin, skill, and prompt has a library page** at `library-context/plugins/<plugin>/index.md`, `library-context/plugins/<plugin>/skills/<skill>/index.md`, or `library-context/prompts/<prompt>/index.md`. Its frontmatter schema is in `library-context/README.md` and enforced by `scripts/validate.mjs`. Keep the two in sync. New pages start as `draft: true`. `draft` hides a page from the website only; merged skills are installable immediately.
+10. **Every plugin and prompt has a library page** at `library-context/plugins/<plugin>/index.md` or `library-context/prompts/<prompt>/index.md`. Skills have no page: each is an item in its plugin page's `skills` list. Its frontmatter schema is in `library-context/README.md` and enforced by `scripts/validate.mjs`. Keep the two in sync. New pages start as `draft: true`. `draft` hides a page from the website only; merged skills are installable immediately.
 
 11. **Public content only.** This repository is public. No customer names without approval, no internal URLs, credentials, tokens, or internal-only process. Don't copy content from internal repositories without checking it is meant to be public.
 
@@ -50,7 +50,7 @@ Run `npm run check` before you finish any change. It validates, builds, and veri
 13. **A prompt is one Markdown file that visitors copy exactly as written.**
     - It lives at `prompts/<prompt>.md`. There are no folders, no frontmatter, and no other files in `prompts/`. Card fields and page text go in its library page.
     - Use a prompt when the user pastes the work into a chat once, such as a prompt that builds a dashboard. Use a skill when an assistant should pick the work up again and again.
-    - A prompt may rely on one assistant's features, such as Claude artifacts. Its page must list where it works in `platforms`. Rules 4 and 8 still apply where they can: name connectors by what they are, and read user data through connectors.
+    - A prompt may rely on one assistant's features, such as Claude artifacts. Its page lists what it relies on in `requirements`. Rules 4 and 8 still apply where they can: name connectors by what they are, and read user data through connectors.
     - Prompts aren't in either marketplace, and the skills CLI must not find them. Never add a `SKILL.md` to `prompts/`.
 
 ## Changing the repository name or marketplace name

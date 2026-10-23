@@ -17,7 +17,7 @@ import {
 import { createZip, fileEntry } from './lib/zip.mjs';
 import { validate, report } from './validate.mjs';
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export function build() {
   const result = validate();
@@ -73,12 +73,17 @@ export function build() {
     });
     const pluginDownload = writeArchive(`plugins/${p}.zip`, pluginEntries, downloadBase);
 
+    // Skills have no page of their own. The plugin page lists them, in the
+    // order the website shows them, with the fields for the plugin's panel.
+    const skillEntries = parseFrontmatter(readText(contextPath.plugin(p))).data.skills;
+    const pluginPage = page(contextPath.plugin(p), rawBase);
+
     items.push({
-      ...page(contextPath.plugin(p), rawBase),
+      ...pluginPage,
       id: `plugin:${p}`,
       type: 'plugin',
       slug: p,
-      skills: plugin.skills.map((s) => s.name),
+      skills: skillEntries.map((s) => s.name),
       displayName: codexManifest.interface?.displayName ?? p,
       paths: { source: plugin.dir, context: contextPath.plugin(p) },
       download: pluginDownload,
@@ -87,15 +92,19 @@ export function build() {
 
     // Skills have no download of their own. Some depend on sibling skills or
     // plugin context, so they're installed with their plugin.
-    for (const skill of plugin.skills) {
-      const s = skill.name;
+    for (const entry of skillEntries) {
+      const s = entry.name;
       items.push({
-        ...page(contextPath.skill(p, s), rawBase),
         id: `skill:${s}`,
         type: 'skill',
         slug: s,
         plugin: p,
-        paths: { source: skill.dir, context: contextPath.skill(p, s) },
+        title: entry.title,
+        summary: entry.summary,
+        output: entry.output ?? null,
+        examples: entry.example ? [{ prompt: entry.example, note: null }] : [],
+        draft: pluginPage.draft,
+        paths: { source: `${plugin.dir}/skills/${s}`, context: contextPath.plugin(p) },
         install: {
           skillsCli: `npx skills add ${config.repository} --skill ${s}`,
           viaPlugin: pluginInstall(p),
@@ -158,10 +167,10 @@ function page(file, rawBase) {
     featured: data.featured ?? false,
     draft: data.draft ?? false,
     image: data.image ? toUrl(data.image) : null,
-    badge: data.badge ?? null,
+    problem: data.problem ?? null,
     output: data.output ?? null,
-    platforms: data.platforms ?? [],
     requirements: (data.requirements ?? []).map((r) => ({ name: r.name, required: r.required, details: r.details ?? null })),
+    customize: data.customize ? { prompt: data.customize.prompt ?? null, note: data.customize.note } : null,
     examples: (data.examples ?? []).map((x) => ({ prompt: x.prompt, note: x.note ?? null })),
     intro,
     sections,
