@@ -6,13 +6,12 @@ categories: [seo]
 tags: [search-console, content-refresh, content-decay, striking-distance, ctr, dashboard]
 featured: false
 draft: false
-badge: Dashboard
+problem: Traffic slipping and no idea which pages to fix first?
 output: Live dashboard with page plans
-platforms: [claude]
 requirements:
   - name: Google Search Console connector
     required: true
-    details: Add it in Claude under Settings → Connectors and sign in with a Google account that can see your property. Everyone who opens the dashboard needs it too, because data loads with each viewer's own access.
+    details: Add it in Claude under Settings → Connectors and sign in with a Google account that can see your property. Everyone who opens the dashboard needs it too, because data loads with each viewer's own access. To check it works, ask Claude to list your Search Console properties.
   - name: Artifacts
     required: true
     details: The dashboard is published as an artifact, a private page in your Claude account that you can share from its Share menu. Usually on by default.
@@ -59,12 +58,6 @@ Every table is sortable, searchable and exportable to CSV. Here is the shape of 
 
 The dashboard reads Search Console and nothing else. It never changes anything in Search Console, your CMS or your site.
 
-## Setup
-
-Add the Google Search Console connector in Claude under **Settings → Connectors**, and sign in with a Google account that can see your property. To check it works, ask Claude to list your Search Console properties.
-
-Make sure artifacts are turned on. They usually are by default.
-
 ## Customize
 
 The prompt has no placeholders. Before it builds anything, Claude reads your Search Console data and comes back with one message of proposed settings. You confirm them or correct them.
@@ -96,9 +89,7 @@ To change the dashboard afterwards, ask in the same chat. The examples on this p
 4. It reads the live title, meta description and headings of those pages, so the plans start from your real copy.
 5. **It publishes the dashboard:** a private page in your Claude account that loads fresh data each time it opens.
 
-## Pitfalls
-
-### What it is not
+## What it isn't
 
 - **Not keyword research.** Search Console only reports searches your site already appears for. It can't show demand where you don't rank at all. For new topics, use a keyword tool.
 - **Not a rank tracker.** Positions are Search Console averages across every search and device, not a daily check of one keyword.
@@ -106,7 +97,7 @@ To change the dashboard afterwards, ask in the same chat. The examples on this p
 - **Not an editor.** It never changes your pages. The action plans are recommendations for you to apply.
 - **Not a backlink audit.** Search Console has no backlink data in this connector, and the plans are told not to guess.
 
-### Mistakes to avoid
+## Mistakes to avoid
 
 - **Skipping the host and exclusion step.** On a domain property, forums and file hosts can take almost all of the rows Search Console returns, and your real pages fall off the end of the list without any error. Confirm your main host and exclusions when Claude proposes them.
 - **Working through the refresh list top to bottom.** When impressions drop across the whole site, the "lost visibility" signal fires on most pages and the list gets long. Sort by urgency and clicks at stake, and use the signal chips to narrow it.

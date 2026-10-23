@@ -31,6 +31,7 @@ for (const n of names) {
 const title = (n) => n.split('-').map((w) => w[0].toUpperCase() + w.slice(1)).join(' ');
 const fill = (template, vars) => readText(`docs/templates/${template}`).replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k]);
 const created = [];
+const updated = [PATHS.claudeMarketplace];
 const write = (rel, content) => {
   fs.mkdirSync(path.dirname(abs(rel)), { recursive: true });
   fs.writeFileSync(abs(rel), content);
@@ -38,6 +39,14 @@ const write = (rel, content) => {
 };
 const writeJson = (rel, data) => fs.writeFileSync(abs(rel), `${JSON.stringify(data, null, 2)}\n`);
 const next = () => console.log('\nNext: replace every "[[fill in: ...]]" placeholder, then run "npm run validate".');
+// A skill's entry in its plugin page's "skills" list. Skills have no page of their own.
+const skillEntry = (s) => [
+  `  - name: ${s}`,
+  `    title: ${title(s)}`,
+  '    summary: "[[fill in: One sentence on what the skill does, under 160 characters.]]"',
+  '    output: "[[fill in: What the user gets, in a few words.]]"',
+  '    example: "[[fill in: A prompt that runs the skill.]]"',
+].join('\n');
 
 // A prompt is one Markdown file and its page. It isn't listed in a marketplace.
 if (kind === 'prompt') {
@@ -93,14 +102,26 @@ if (kind === 'plugin') {
     policy: { installation: 'AVAILABLE', authentication: 'ON_INSTALL' },
     category: 'Productivity',
   });
-  write(contextPath.plugin(plugin), fill('plugin-page.template.md', { plugin, title: title(plugin) }));
+  write(contextPath.plugin(plugin), fill('plugin-page.template.md', { plugin, skillEntry: skillEntry(skill), title: title(plugin) }));
 } else if (!exists(`${PATHS.plugins}/${plugin}`)) {
   die(`plugins/${plugin} does not exist. Create it with "npm run new:plugin -- ${plugin} ${skill}".`);
+} else {
+  // Add the skill to the end of the plugin page's "skills" list.
+  const page = contextPath.plugin(plugin);
+  const lines = readText(page).split('\n');
+  const start = lines.findIndex((l) => /^skills:\s*$/.test(l));
+  if (start === -1) console.log(`Add an item for "${skill}" to "skills" in ${page}.`);
+  else {
+    let end = start + 1;
+    while (end < lines.length && /^\s+\S/.test(lines[end])) end++;
+    lines.splice(end, 0, skillEntry(skill));
+    fs.writeFileSync(abs(page), lines.join('\n'));
+    updated.push(page);
+  }
 }
 
-// The skill, its page, and its marketplace listing.
+// The skill and its marketplace listing.
 write(`${PATHS.plugins}/${plugin}/skills/${skill}/SKILL.md`, fill('SKILL.template.md', { skill, title: title(skill) }));
-write(contextPath.skill(plugin, skill), fill('skill-page.template.md', { skill, title: title(skill) }));
 const entry = claude.plugins.find((e) => e.name === plugin);
 if (!entry) die(`plugins/${plugin} has no entry in ${PATHS.claudeMarketplace}. Fix that first.`);
 entry.skills = [...(entry.skills ?? []), `./skills/${skill}`];
@@ -108,5 +129,6 @@ entry.skills = [...(entry.skills ?? []), `./skills/${skill}`];
 writeJson(PATHS.claudeMarketplace, claude);
 writeJson(PATHS.codexMarketplace, codex);
 
-console.log(`Created:\n${created.map((f) => `  ${f}`).join('\n')}\nUpdated:\n  ${PATHS.claudeMarketplace}${kind === 'plugin' ? `\n  ${PATHS.codexMarketplace}` : ''}`);
+if (kind === 'plugin') updated.push(PATHS.codexMarketplace);
+console.log(`Created:\n${created.map((f) => `  ${f}`).join('\n')}\nUpdated:\n${updated.map((f) => `  ${f}`).join('\n')}`);
 next();

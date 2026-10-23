@@ -30,13 +30,18 @@ const PAGE_KEYS = {
   featured: { required: false },
   draft: { required: false },
   image: { required: false },
-  badge: { required: false },
+  problem: { required: true },
   output: { required: false },
-  platforms: { required: false },
   requirements: { required: false },
+  customize: { required: false, kinds: ['plugin'] },
+  skills: { required: true, kinds: ['plugin'] },
   examples: { required: false },
 };
-const REQUIRED_SECTIONS = ['How it works', 'Setup'];
+// Each item in a plugin page's "skills" list: the skill's entry in the plugin's panel.
+const SKILL_ENTRY_KEYS = ['name', 'title', 'summary', 'output', 'example'];
+// Each "## " heading is a tab on the website.
+const SECTIONS = ['How it works', 'Customize', 'How to use', "What it isn't", 'Mistakes to avoid'];
+const REQUIRED_SECTIONS = ['How it works'];
 
 // Placeholder marker used by docs/templates/. Nothing ships while one is left.
 const PLACEHOLDER = '[[fill in';
@@ -260,23 +265,22 @@ function validateContext(plugins, prompts, { error, warn }) {
   else {
     try {
       taxonomy = parseYaml(readText(PATHS.taxonomy));
-      for (const k of ['categories', 'platforms']) {
-        const list = taxonomy?.[k];
-        if (!Array.isArray(list) || list.some((c) => !c?.id || !c?.label)) error(PATHS.taxonomy, `"${k}" must be a list of { id, label }.`);
-        else if (new Set(list.map((c) => c.id)).size !== list.length) error(PATHS.taxonomy, `"${k}" has a duplicate id.`);
-      }
+      const list = taxonomy?.categories;
+      if (!Array.isArray(list) || list.some((c) => !c?.id || !c?.label)) error(PATHS.taxonomy, '"categories" must be a list of { id, label }.');
+      else if (new Set(list.map((c) => c.id)).size !== list.length) error(PATHS.taxonomy, '"categories" has a duplicate id.');
     } catch (e) {
       error(PATHS.taxonomy, `Not valid YAML (${e.message.split('\n')[0]}).`);
     }
   }
   const categoryIds = (taxonomy?.categories ?? []).map((c) => c.id);
-  const platformIds = (taxonomy?.platforms ?? []).map((c) => c.id);
 
-  // Every plugin, skill, and prompt has a page. The value is the kind of page.
+  // Every plugin and prompt has a page. The value is the kind of page.
+  // Skills have no page: their plugin page lists them under "skills".
   const expectedPages = new Map();
+  const pluginSkills = new Map();
   for (const p of plugins) {
     expectedPages.set(contextPath.plugin(p.name), 'plugin');
-    for (const s of p.skills) expectedPages.set(contextPath.skill(p.name, s.name), 'skill');
+    pluginSkills.set(contextPath.plugin(p.name), p.skills.map((s) => s.name));
   }
   for (const p of prompts) expectedPages.set(contextPath.prompt(p.name), 'prompt');
 
@@ -286,8 +290,6 @@ function validateContext(plugins, prompts, { error, warn }) {
     /^taxonomy\.yml$/,
     /^plugins\/[^/]+\/index\.md$/,
     /^plugins\/[^/]+\/assets\/.+$/,
-    /^plugins\/[^/]+\/skills\/[^/]+\/index\.md$/,
-    /^plugins\/[^/]+\/skills\/[^/]+\/assets\/.+$/,
     /^prompts\/[^/]+\/index\.md$/,
     /^prompts\/[^/]+\/assets\/.+$/,
   ];
@@ -299,14 +301,18 @@ function validateContext(plugins, prompts, { error, warn }) {
       error(f, 'Website pages are named index.md. A SKILL.md here would be picked up as an installable skill.');
       continue;
     }
+    if (/^plugins\/[^/]+\/skills\//.test(e.path)) {
+      error(f, 'Skills have no page of their own. Describe the skill in the "skills" list of its plugin page, plugins/<plugin>/index.md.');
+      continue;
+    }
     if (!allowed.some((re) => re.test(e.path))) {
-      error(f, 'Unexpected file. Pages are plugins/<plugin>/index.md, plugins/<plugin>/skills/<skill>/index.md, or prompts/<prompt>/index.md, and images go in an assets/ folder next to the page.');
+      error(f, 'Unexpected file. Pages are plugins/<plugin>/index.md or prompts/<prompt>/index.md, and images go in an assets/ folder next to the page.');
       continue;
     }
     if (e.path.endsWith('/index.md') && !expectedPages.has(f)) {
       error(f, e.path.startsWith('prompts/')
         ? 'This page has no matching prompt. Add prompts/<prompt>.md with the same name as the folder, or remove the page.'
-        : 'This page has no matching plugin or skill in plugins/. Check the folder names, or remove the page.');
+        : 'This page has no matching plugin in plugins/. Check the folder name, or remove the page.');
     }
     if (e.path.includes('/assets/') && fs.statSync(abs(f)).size > 2 * MB) warn(f, 'Image is over 2 MB. Compress it before adding it.');
   }
@@ -324,7 +330,7 @@ function validateContext(plugins, prompts, { error, warn }) {
       error(page, `Frontmatter problem: ${fmError}.`);
       continue;
     }
-    validatePage(page, kind, data, body, { categoryIds, platformIds, error, warn });
+    validatePage(page, kind, data, body, { categoryIds, skillNames: pluginSkills.get(page), error, warn });
     if (typeof data.title === 'string') {
       if (titles.has(data.title)) warn(page, `The title "${data.title}" is also used by ${titles.get(data.title)}.`);
       titles.set(data.title, page);
@@ -332,23 +338,27 @@ function validateContext(plugins, prompts, { error, warn }) {
   }
 }
 
-function validatePage(page, kind, d, body, { categoryIds, platformIds, error, warn }) {
+function validatePage(page, kind, d, body, { categoryIds, skillNames, error, warn }) {
   const dir = path.posix.dirname(page);
+  const keys = Object.keys(PAGE_KEYS).filter((k) => !PAGE_KEYS[k].kinds || PAGE_KEYS[k].kinds.includes(kind));
   for (const k of Object.keys(d)) {
-    if (!(k in PAGE_KEYS)) error(page, `Unknown field "${k}". Check the spelling. Allowed fields: ${Object.keys(PAGE_KEYS).join(', ')}.`);
+    if (k in PAGE_KEYS && !keys.includes(k)) error(page, `"${k}" is only for ${PAGE_KEYS[k].kinds.join(' and ')} pages.`);
+    else if (!(k in PAGE_KEYS)) error(page, `Unknown field "${k}". Check the spelling. Allowed fields: ${keys.join(', ')}.`);
   }
-  for (const [k, rule] of Object.entries(PAGE_KEYS)) {
-    if (rule.required && (d[k] === undefined || d[k] === null || d[k] === '')) error(page, `"${k}" is required.`);
+  for (const k of keys) {
+    if (PAGE_KEYS[k].required && (d[k] === undefined || d[k] === null || d[k] === '')) error(page, `"${k}" is required.`);
   }
+  // The card shows the reader's problem in place of the first example.
+  if (typeof d.problem === 'string' && d.problem.length > 70) error(page, `"problem" is ${d.problem.length} characters. The limit is 70.`);
   const str = (k, max) => {
     if (d[k] === undefined || d[k] === null) return;
     if (typeof d[k] !== 'string') return error(page, `"${k}" must be text.`);
     if (max && d[k].length > max) warn(page, `"${k}" is ${d[k].length} characters. Keep it under ${max}.`);
   };
   str('title', 60);
+  str('problem');
   str('summary', 160);
   str('description', 160);
-  str('badge', 20);
   str('output', 80);
 
   const list = (k, allowedIds, label) => {
@@ -362,9 +372,6 @@ function validatePage(page, kind, d, body, { categoryIds, platformIds, error, wa
   };
   list('categories', categoryIds, 'category');
   if (Array.isArray(d.categories) && !d.categories.length) error(page, '"categories" needs at least one category.');
-  list('platforms', platformIds, 'platform');
-  // A prompt is pasted into one assistant and often relies on its features, such as artifacts.
-  if (kind === 'prompt' && !d.platforms?.length) error(page, '"platforms" is required for a prompt. List the assistants it works in, for example [claude].');
   list('tags');
   if (Array.isArray(d.tags)) {
     for (const t of d.tags) if (typeof t === 'string' && !NAME_RE.test(t)) error(page, `Tag "${t}" must be lowercase words joined by hyphens, such as "ai-search".`);
@@ -391,6 +398,44 @@ function validatePage(page, kind, d, body, { categoryIds, platformIds, error, wa
   }
   if (!d.examples?.length) warn(page, 'Add at least one item to "examples". The website shows them as prompts visitors can copy.');
 
+  if (d.customize !== undefined && kind === 'plugin') {
+    const c = d.customize;
+    if (typeof c !== 'object' || c === null || Array.isArray(c)) error(page, '"customize" must have a "note" and an optional "prompt".');
+    else {
+      if (typeof c.note !== 'string' || !c.note.trim()) error(page, '"customize" needs a "note".');
+      if (c.prompt !== undefined && typeof c.prompt !== 'string') error(page, '"customize.prompt" must be text.');
+      for (const k of Object.keys(c)) if (!['prompt', 'note'].includes(k)) error(page, `"customize" has an unknown field "${k}".`);
+    }
+  }
+
+  if (kind === 'plugin' && !d.requirements?.length) warn(page, 'Add "requirements". The website shows them on the Install tab and as chips on the card.');
+
+  // One entry per skill, in the order the website lists them in the plugin's panel.
+  if (kind === 'plugin' && d.skills != null) {
+    const listed = d.skills;
+    if (!Array.isArray(listed) || listed.some((x) => typeof x !== 'object' || x === null || Array.isArray(x))) {
+      error(page, `"skills" must be a list with one item per skill (${skillNames.join(', ')}), each with "name", "title", "summary", "output" and "example".`);
+    } else {
+      const names = listed.map((x) => x.name);
+      for (const s of skillNames) if (!names.includes(s)) error(page, `"skills": add an item for "${s}".`);
+      listed.forEach((x, n) => {
+        const at = `"skills" item ${n + 1}${typeof x.name === 'string' ? ` (${x.name})` : ''}`;
+        if (typeof x.name !== 'string') error(page, `${at} needs a "name", the skill's folder name.`);
+        else if (!skillNames.includes(x.name)) error(page, `${at}: "${x.name}" is not a skill in this plugin.`);
+        for (const k of ['title', 'summary']) if (typeof x[k] !== 'string' || !x[k].trim()) error(page, `${at} needs a "${k}".`);
+        for (const k of ['output', 'example']) {
+          if (x[k] === undefined) warn(page, `${at} has no "${k}". The website's hero demo only plays skills with an example and an output.`);
+          else if (typeof x[k] !== 'string') error(page, `${at}: "${k}" must be text.`);
+        }
+        if (x.title?.length > 60) warn(page, `${at}: "title" is ${x.title.length} characters. Keep it under 60.`);
+        if (x.summary?.length > 160) warn(page, `${at}: "summary" is ${x.summary.length} characters. Keep it under 160.`);
+        if (x.output?.length > 80) warn(page, `${at}: "output" is ${x.output.length} characters. Keep it under 80.`);
+        for (const k of Object.keys(x)) if (!SKILL_ENTRY_KEYS.includes(k)) error(page, `${at} has an unknown field "${k}". Allowed: ${SKILL_ENTRY_KEYS.join(', ')}.`);
+      });
+      if (new Set(names).size !== names.length) error(page, '"skills" lists the same skill twice.');
+    }
+  }
+
   if (d.image !== undefined && (typeof d.image !== 'string' || !insideAndExists(dir, d.image, PATHS.context))) {
     error(page, `"image" points to "${d.image}", which does not exist inside library-context/.`);
   }
@@ -399,8 +444,12 @@ function validatePage(page, kind, d, body, { categoryIds, platformIds, error, wa
   }
 
   const { sections } = splitSections(body);
-  const headings = sections.map((s) => s.heading.toLowerCase());
-  for (const h of REQUIRED_SECTIONS) if (!headings.includes(h.toLowerCase())) error(page, `Add a "## ${h}" section.`);
+  const norm = (h) => h.toLowerCase().replace(/’/g, "'");
+  const headings = sections.map((s) => norm(s.heading));
+  for (const h of REQUIRED_SECTIONS) if (!headings.includes(norm(h))) error(page, `Add a "## ${h}" section.`);
+  for (const s of sections) {
+    if (!SECTIONS.map(norm).includes(norm(s.heading))) error(page, `"## ${s.heading}" isn't a section the website shows. Use ${SECTIONS.map((h) => `"## ${h}"`).join(', ')}, or make it a "### " heading inside one.`);
+  }
   for (const s of sections) if (!s.markdown) warn(page, `The "## ${s.heading}" section is empty.`);
   if (/^#\s/m.test(body.replace(/```[\s\S]*?```/g, ''))) warn(page, 'Use "## " for section headings. The page title comes from "title".');
 }

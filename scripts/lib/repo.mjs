@@ -134,7 +134,6 @@ export function gitCommit() {
 
 export const contextPath = {
   plugin: (p) => `${PATHS.context}/plugins/${p}/index.md`,
-  skill: (p, s) => `${PATHS.context}/plugins/${p}/skills/${s}/index.md`,
   prompt: (name) => `${PATHS.context}/prompts/${name}/index.md`,
 };
 

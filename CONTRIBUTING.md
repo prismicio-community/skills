@@ -8,7 +8,7 @@ Maintainers and coding agents: also read [AGENTS.md](AGENTS.md) for the reposito
 
 | You want to change | Edit this | Who sees it |
 | --- | --- | --- |
-| Text or images on the library page | `library-context/plugins/<plugin>/index.md`, `library-context/plugins/<plugin>/skills/<skill>/index.md`, or `library-context/prompts/<prompt>/index.md` | Website visitors |
+| Text or images on the library page | `library-context/plugins/<plugin>/index.md` or `library-context/prompts/<prompt>/index.md`. A skill's title and summary are in its plugin's page | Website visitors |
 | What a skill tells the assistant to do | `plugins/<plugin>/skills/<skill>/SKILL.md` and the files next to it | Everyone who installs the skill |
 | The text of a prompt | `prompts/<prompt>.md` | Everyone who copies the prompt |
 | A plugin's name and description in Claude or ChatGPT | `.claude-plugin/marketplace.json` and `plugins/<plugin>/.codex-plugin/plugin.json` | Everyone who browses the marketplace |
@@ -35,7 +35,6 @@ prompts/<prompt>.md                 One prompt, copied and pasted as written
 library-context/                    Library page content (not installed)
   taxonomy.yml                      Allowed categories and platforms
   plugins/<plugin>/index.md         Plugin page
-  plugins/<plugin>/skills/<skill>/index.md   Skill page
   prompts/<prompt>/index.md         Prompt page
 docs/                               Templates and the website data format
 scripts/                            Validation and packaging
@@ -86,11 +85,11 @@ Set `draft: true`. The website skips drafts.
 2. Edit, commit to a new branch, and open a pull request, as for a library page.
 3. Before you ask for a review, try the changed skill at least once. Upload the skill folder in Claude, or ask a maintainer to install your branch.
 
-If the change affects what visitors should know, update the skill's library page in the same pull request.
+If the change affects what visitors should know, update the plugin's library page in the same pull request. The skill's title and summary are in that page's `skills` list.
 
 ## Add a new skill
 
-Each skill needs a folder, a website page, and a line in the Claude marketplace. A maintainer or a coding agent can create all three with one command:
+Each skill needs a folder, an item in its plugin's library page, and a line in the Claude marketplace. A maintainer or a coding agent can create all three with one command:
 
 ```
 npm run new:skill -- <plugin> <skill-name>
@@ -102,9 +101,9 @@ To do it in the GitHub website instead:
    - Select **Add file → Create new file**.
    - For the name, type `plugins/<plugin>/skills/<skill-name>/SKILL.md`. Typing `/` creates the folders.
    - Copy the content of [docs/templates/SKILL.template.md](docs/templates/SKILL.template.md) into the file. Replace `{{skill}}` with the skill name and `{{title}}` with a readable title.
-2. **Create the page.**
-   - Create `library-context/plugins/<plugin>/skills/<skill-name>/index.md` the same way.
-   - Fill it from [docs/templates/skill-page.template.md](docs/templates/skill-page.template.md).
+2. **Describe it on the plugin's page.**
+   - Open `library-context/plugins/<plugin>/index.md`.
+   - Add an item to the `skills` list with `name`, `title`, `summary`, `output`, and `example`. Copy an existing item. The website lists skills in this order.
 3. **List the skill in the Claude marketplace.**
    - In `.claude-plugin/marketplace.json`, find your plugin.
    - Add `"./skills/<skill-name>"` to its `"skills"` list.

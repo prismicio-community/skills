@@ -1,5 +1,5 @@
 # Allowed values for the library page filters.
-# Pages may only use the ids listed here. To add a category or platform,
+# Pages may only use the ids listed here. To add a category,
 # add it here in the same pull request.
 
 categories:
@@ -13,13 +13,3 @@ categories:
     label: Design
   - id: development
     label: Development
-
-platforms:
-  - id: claude
-    label: Claude apps
-  - id: claude-code
-    label: Claude Code
-  - id: chatgpt
-    label: ChatGPT
-  - id: codex
-    label: Codex

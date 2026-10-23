@@ -6,9 +6,8 @@ categories: [content]
 tags: [{{prompt}}]
 featured: false
 draft: true
-badge: "[[fill in: What the prompt makes, such as Dashboard or Report.]]"
+problem: "[[fill in: The reader's problem in one line, under 70 characters.]]"
 output: "[[fill in: What the user gets, in a few words.]]"
-platforms: [claude]
 requirements:
   - name: "[[fill in: Connector or feature name]]"
     required: true
@@ -22,15 +21,11 @@ examples:
 
 [[fill in: What the prompt makes, and what the assistant does to make it. Don't repeat the prompt itself: the website shows it from prompts/{{prompt}}.md.]]
 
-## Setup
-
-[[fill in: What to connect or turn on before pasting the prompt. If nothing, write "No setup is needed."]]
-
 ## How to use
 
 1. Copy the prompt and paste it into a new chat.
 2. [[fill in: What happens next, and when the assistant stops for your input.]]
 
-## Pitfalls
+## Mistakes to avoid
 
 - [[fill in: A mistake people make, and how to avoid it.]]
