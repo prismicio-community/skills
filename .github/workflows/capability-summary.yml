@@ -1,0 +1,73 @@
+name: Capability summary
+
+# Comments on each pull request with what it changes about what installed
+# skills can do: bundled scripts, plugin capabilities, tool permissions,
+# network hosts, install commands, and the repository's own checks.
+# Pull requests that change any of these get the "capability-change" label.
+#
+# pull_request_target runs this file and scripts/pr-summary.mjs from main,
+# with a token that can comment on pull requests from forks. The pull
+# request's commits are fetched only as data for git diff. Never check out,
+# install, or run code from the pull request in this workflow.
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: capability-summary-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  summary:
+    name: Summarize capability changes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Fetch the pull request's commits as data
+        env:
+          PR: ${{ github.event.pull_request.number }}
+        run: git fetch --no-tags origin "+refs/pull/${PR}/head:refs/remotes/pr/head"
+
+      - name: Summarize
+        id: summary
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          node scripts/pr-summary.mjs "$BASE" refs/remotes/pr/head > "$RUNNER_TEMP/summary.md"
+          cat "$RUNNER_TEMP/summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Post the comment and set the label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          NOTABLE: ${{ steps.summary.outputs.notable }}
+        run: |
+          set -euo pipefail
+          LABEL=capability-change
+
+          # Update the earlier comment if there is one. Otherwise comment only when there's something to review.
+          existing=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+            --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- capability-summary -->"))) | .id' | head -n1)
+          if [ -n "$existing" ]; then
+            gh api --method PATCH "repos/$REPO/issues/comments/$existing" -F body=@"$RUNNER_TEMP/summary.md" > /dev/null
+          elif [ "$NOTABLE" = "true" ]; then
+            gh api --method POST "repos/$REPO/issues/$PR/comments" -F body=@"$RUNNER_TEMP/summary.md" > /dev/null
+          fi
+
+          if [ "$NOTABLE" = "true" ]; then
+            gh label create "$LABEL" --repo "$REPO" --color D93F0B --description "Changes what installed skills can do" 2> /dev/null || true
+            gh api --method POST "repos/$REPO/issues/$PR/labels" -f "labels[]=$LABEL" > /dev/null
+          else
+            gh api --method DELETE "repos/$REPO/issues/$PR/labels/$LABEL" > /dev/null 2>&1 || true
+          fi

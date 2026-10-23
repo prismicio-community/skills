@@ -169,6 +169,20 @@ Fix the file on your branch and commit. The check runs again on its own.
 
 Warnings (`!`) don't block merging, but read them.
 
+## Security checks
+
+Everything merged into `main` reaches auto-updating installs right away, so two checks look at what a change lets an assistant do.
+
+**Validate** blocks merging when a plugin, skill, or prompt has:
+- Invisible or text-reordering characters, which can hide instructions from reviewers.
+- HTML comments in `SKILL.md`, references, or prompts. Template markers in a skill's `assets/` are fine.
+- Commands that run downloaded or hidden code, such as `curl ... | sh`, or `--break-system-packages`.
+- Bundled scripts that use `eval` or `exec`, run shell commands, or unpickle data.
+- Bundled scripts that name a host other than placeholder ones like `example.com`. Scripts should take URLs from the user. If a script needs a fixed host, add it to `SCRIPT_HOSTS` in `scripts/validate.mjs` in the same pull request so it gets reviewed.
+- Long encoded strings, binary or archive files, or SVG images with scripts in them.
+
+**Capability summary** comments on the pull request when it adds or changes bundled scripts, hooks or MCP servers, `allowed-tools`, new hosts, install or download commands, or the repository's own checks. Those pull requests also get the `capability-change` label. The comment doesn't block merging. It tells the reviewer what to read closely, so explain anything it lists in the pull request description.
+
 ## After merging
 
 On every merge into `main`:

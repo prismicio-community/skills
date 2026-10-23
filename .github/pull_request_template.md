@@ -16,3 +16,4 @@
 - [ ] New or changed skills and prompts were tried in Claude or ChatGPT at least once.
 - [ ] New pages are marked `draft: true` until they are ready to appear on the website.
 - [ ] Nothing internal: no customer names, private links, credentials, or internal-only process.
+- [ ] If the **Capability summary** comment lists anything, "What changed" explains why.
