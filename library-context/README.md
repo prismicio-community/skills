@@ -97,9 +97,28 @@ On plugin and prompt pages, each `## ` heading becomes a tab of the item's panel
 | `## What it isn't` | No | Pitfalls | What it doesn't do, and what to use instead |
 | `## Mistakes to avoid` | No | Pitfalls | Common mistakes and how to avoid them |
 
-What to connect or turn on goes in `requirements`, not in a section. Don't explain how to install the plugin. The website adds the install steps for every item automatically.
+What to connect or turn on goes in `requirements`. Don't explain how to install the plugin. The website adds the install steps for every item automatically.
 
 On a prompt page, don't paste the prompt itself. The website shows it, with a Copy button, from `prompts/<prompt>.md`.
+
+#### Videos
+
+A YouTube link on a line of its own becomes a video player that plays when clicked. It works in any section.
+
+- The website supports `youtube.com/watch?v=…`, `youtu.be/…`, `youtube.com/shorts/…`, and `youtube.com/embed/…` links.
+- Write the link as a plain URL, as `<url>`, or as `[text](url)`. The link must be the only thing in its paragraph.
+- A link inside a sentence stays a normal link.
+- The website doesn't render raw HTML, such as an `<iframe>`. Use a link instead.
+
+The website generates the Install tab for every plugin, so a video can't go there. Put setup videos, such as how to connect a connector, under `## How it works` or `## How to use`, and list the connector in `requirements` too:
+
+```markdown
+## How to use
+
+This plugin needs the Google Search Console connector. Here's how to set it up:
+
+https://www.youtube.com/watch?v=VIDEO_ID
+```
 
 Skill pages have no required sections, because the website doesn't show their text.
 

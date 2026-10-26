@@ -73,6 +73,16 @@ Images for a page go in an `assets` folder next to the page's `index.md`:
 
 Use PNG, JPG, SVG, or WebP, and keep each image under 2 MB. Always describe the image in the square brackets.
 
+### Add a video
+
+Paste a YouTube link on a line of its own, in any section. The website turns it into a video player:
+
+```markdown
+https://www.youtube.com/watch?v=VIDEO_ID
+```
+
+A link inside a sentence stays a normal link, and an `<iframe>` isn't shown. Videos can't go on the Install tab, so put setup videos under `## How it works` or `## How to use`. See [library-context/README.md](library-context/README.md#videos) for the supported links.
+
 ### Hide a page until it's ready
 
 Set `draft: true`. The website skips drafts.
