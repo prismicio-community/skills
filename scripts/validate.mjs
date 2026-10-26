@@ -6,7 +6,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parse as parseYaml } from 'yaml';
 import {
-  PATHS, abs, exists, readText, readJson, listDirs, walk, hasExactFile, parseFrontmatter,
+  PATHS, abs, exists, readText, readJson, listDirs, walk, walkFiles, hasExactFile, parseFrontmatter,
   splitSections, relativeLinks, loadPlugins, loadPrompts, contextPath,
 } from './lib/repo.mjs';
 
@@ -45,6 +45,45 @@ const REQUIRED_SECTIONS = ['How it works'];
 
 // Placeholder marker used by docs/templates/. Nothing ships while one is left.
 const PLACEHOLDER = '[[fill in';
+
+// ---------------------------------------------------------------- security rules
+// A merge to main ships to every auto-updating install, so these checks catch
+// what a reviewer can't see in a diff or shouldn't have to spot by eye.
+
+// Files a plugin package may ship. Anything else (binaries, archives, compiled
+// code) can't be reviewed in a pull request.
+const TEXT_EXT = /\.(md|txt|json|ya?ml|svg|html|css|csv|xml|toml|py|mjs|cjs|js|ts|sh)$/i;
+const IMAGE_EXT = /\.(png|jpe?g|gif|webp)$/i;
+const SCRIPT_EXT = /\.(py|mjs|cjs|js|ts|sh)$/i;
+
+// Hosts bundled scripts may name in a URL. Scripts should take real URLs from
+// the user. Adding a host here is a reviewed decision, not a formality.
+const SCRIPT_HOSTS = [/^(.+\.)?example\.(com|org|net)$/, /^www\.w3\.org$/, /^localhost$/, /^127\.0\.0\.1$/];
+
+// Characters that render as nothing or reorder text, so a reviewer can't see
+// what the agent reads. Emoji joiners and presentation selectors are allowed.
+const INVISIBLE_RE = /[­᠎​-‏‪-‮⁠-⁤⁦-⁯︀-️﻿￹-￻\u{E0000}-\u{E007F}\u{E0100}-\u{E01EF}]/gu;
+const EMOJI_PART_RE = /[\p{Extended_Pictographic}\p{Emoji_Modifier}0-9#*️]/u;
+
+// Instructions or code that run something the reviewer never sees.
+const UNSEEN = 'Skills must not run code the reviewer can\'t see.';
+const RISKY_TEXT = [
+  [/\b(curl|wget|irm|iwr|Invoke-WebRequest|Invoke-RestMethod)\b[^\n|]*\|\s*(sudo\s+)?((ba|z|da|k)?sh|python3?|node|perl|ruby|iex|Invoke-Expression)\b/i, `pipes a download into an interpreter. ${UNSEEN}`],
+  [/\|\s*(sudo\s+)?(ba|z|da|k)?sh\b(?![.-])/, `pipes text into a shell. ${UNSEEN}`],
+  [/\b(ba|z)?sh\s+(-c\s+)?["']?(\$\(|<\()\s*(curl|wget)\b/, `runs a downloaded script. ${UNSEEN}`],
+  [/\b(source|\.)\s+<\(\s*(curl|wget)\b/, `runs a downloaded script. ${UNSEEN}`],
+  [/\b(iex|Invoke-Expression)\b/i, `runs a string as PowerShell code. ${UNSEEN}`],
+  [/--break-system-packages/, 'overrides the system\'s package protections. Install packages only with the user\'s approval, preferably in a virtual environment.'],
+];
+const SCRIPT_ONLY = 'Bundled scripts must not run dynamic code or shell commands.';
+const RISKY_SCRIPT = [
+  [/(?<![\w.$])(eval|exec)\s*\(/, `runs a string as code (eval or exec). ${SCRIPT_ONLY}`],
+  [/\b__import__\s*\(|\bnew\s+Function\s*\(/, `loads code dynamically. ${SCRIPT_ONLY}`],
+  [/\bos\.(system|popen|exec\w*|spawn\w*)\s*\(|\bshell\s*=\s*True\b/, `runs a shell command. ${SCRIPT_ONLY}`],
+  [/\b(pickle|marshal|dill)\.loads?\s*\(/, `unpickles data, which can run code. ${SCRIPT_ONLY}`],
+];
+const ENCODED_BLOB_RE = /[A-Za-z0-9+/]{300,}={0,2}|(\\x[0-9a-fA-F]{2}){40,}/;
+const SVG_ACTIVE_RE = /<script\b|<foreignObject\b|\bon[a-z]+\s*=|javascript:/i;
 
 export function validate() {
   const errors = [];
@@ -199,7 +238,104 @@ export function validate() {
   // ---------------------------------------------------------------- library-context
   validateContext(plugins, prompts, { error, warn });
 
+  // ---------------------------------------------------------------- security
+  validateSecurity({ error, warn });
+
   return { errors, warnings, plugins, prompts };
+}
+
+function validateSecurity({ error, warn }) {
+  const shipped = [
+    PATHS.claudeMarketplace,
+    PATHS.codexMarketplace,
+    ...walkFiles(PATHS.plugins).map((f) => `${PATHS.plugins}/${f}`),
+    ...walkFiles(PATHS.prompts).map((f) => `${PATHS.prompts}/${f}`),
+  ].filter(exists);
+  const website = walkFiles(PATHS.context).map((f) => `${PATHS.context}/${f}`);
+
+  for (const f of shipped) {
+    if (IMAGE_EXT.test(f)) continue;
+    if (!TEXT_EXT.test(f)) {
+      error(f, 'Only text files and PNG, JPG, GIF, or WebP images can ship. Binary, compiled, and archive files can\'t be reviewed in a pull request.');
+      continue;
+    }
+    const text = fs.readFileSync(abs(f), 'utf8');
+    checkHiddenCharacters(f, text, error);
+    if (f.endsWith('.svg')) {
+      checkSvg(f, text, error);
+      continue;
+    }
+
+    // Template markers in a skill's assets/ are filled in by the agent, so comments are expected there.
+    if (f.endsWith('.md') && !/\/skills\/[^/]+\/assets\//.test(f)) {
+      const m = stripCode(text).match(/<!--[\s\S]*?-->/);
+      if (m) error(f, `HTML comment on line ${lineOf(text, text.indexOf(m[0]))}. Comments are hidden when Markdown is rendered, so reviewers can miss what the agent reads. Write the text visibly instead.`);
+    }
+
+    const reported = new Set();
+    const flag = (rules) => {
+      for (const [re, what] of rules) {
+        const m = text.match(re);
+        if (!m) continue;
+        const line = lineOf(text, m.index);
+        if (reported.has(line)) continue;
+        reported.add(line);
+        error(f, `Line ${line} ${what}`);
+      }
+    };
+    flag(RISKY_TEXT);
+    if (ENCODED_BLOB_RE.test(text)) {
+      error(f, `Line ${lineOf(text, text.search(ENCODED_BLOB_RE))} has a long encoded string that can't be reviewed. Ship the file it decodes to instead.`);
+    }
+
+    if (SCRIPT_EXT.test(f)) {
+      flag(RISKY_SCRIPT);
+      if (f.endsWith('.sh') && /^\s*eval\s/m.test(text)) error(f, 'Uses eval. Bundled scripts must not run dynamic code.');
+      if (/\bsubprocess\b|\bchild_process\b/.test(text)) warn(f, 'Starts other programs. Check exactly what it runs and that the skill asks the user first when it matters.');
+      if (text.split('\n').some((l) => l.length > 1000)) warn(f, 'Has a line over 1,000 characters, which looks minified. Ship readable source.');
+      const hosts = new Set([...text.matchAll(/\bhttps?:\/\/([A-Za-z0-9.-]+)/g)].map((m) => m[1].toLowerCase()));
+      for (const host of hosts) {
+        if (!/^[a-z0-9-]+(\.[a-z0-9-]+)*$/.test(host) || !/[a-z]/.test(host)) continue;
+        if (SCRIPT_HOSTS.some((re) => re.test(host))) continue;
+        error(f, `Names the host "${host}", which isn't on the SCRIPT_HOSTS list in scripts/validate.mjs. Scripts should take URLs from the user. If the host is needed, add it to the list so a maintainer reviews it.`);
+      }
+    }
+  }
+
+  // Website text isn't installed, but it's still read by people and rendered on the site.
+  for (const f of website) {
+    if (f.endsWith('.svg')) checkSvg(f, readText(f), error);
+    if (/\.(md|ya?ml)$/i.test(f)) checkHiddenCharacters(f, fs.readFileSync(abs(f), 'utf8'), error);
+  }
+}
+
+function checkHiddenCharacters(f, text, error) {
+  const found = [];
+  for (const m of text.matchAll(INVISIBLE_RE)) {
+    const c = m[0].codePointAt(0);
+    if (c === 0xFEFF && m.index === 0) continue;
+    const prev = [...text.slice(Math.max(0, m.index - 2), m.index)].pop() ?? '';
+    if ([0x200D, 0xFE0E, 0xFE0F].includes(c) && EMOJI_PART_RE.test(prev)) continue;
+    found.push(m);
+  }
+  if (!found.length) return;
+  const first = found[0];
+  const code = `U+${first[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`;
+  error(f, `Has ${found.length} invisible or text-reordering character(s), the first ${code} on line ${lineOf(text, first.index)}. They can hide instructions from reviewers. Delete them.`);
+}
+
+function checkSvg(f, text, error) {
+  if (SVG_ACTIVE_RE.test(text)) error(f, 'SVG images must not contain scripts, event handlers, javascript: links, or embedded HTML.');
+}
+
+// Removes fenced and inline code, keeping offsets, so examples in code aren't flagged.
+function stripCode(text) {
+  const blank = (s) => s.replace(/[^\n]/g, ' ');
+  return text.replace(/^(```|~~~)[\s\S]*?^\1/gm, blank).replace(/`[^`\n]+`/g, blank);
+}
+
+function lineOf(text, index) {
+  return text.slice(0, index).split('\n').length;
 }
 
 function validateSkill(skill, { error, warn }) {
