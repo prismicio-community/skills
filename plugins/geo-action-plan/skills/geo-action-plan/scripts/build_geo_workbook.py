@@ -101,7 +101,10 @@ try:
     from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
     from openpyxl.utils import get_column_letter
 except ImportError:
-    sys.exit("openpyxl is required: pip install openpyxl --break-system-packages")
+    sys.exit(
+        "openpyxl is required. With the user's approval, install it in a virtual "
+        "environment: python3 -m venv .venv && .venv/bin/pip install openpyxl"
+    )
 
 
 LEGAL_ACTIONS = {"Create", "Update", "Retarget", "Consolidate", "Keep", "Fix"}
