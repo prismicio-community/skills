@@ -64,3 +64,22 @@ jobs:
           done
 
           gh release edit "$TAG" --notes "Downloads for the Prismic AI library, built from $GITHUB_SHA. Rebuilt on every change to main."
+
+      # Tell the website to drop its cached library.json. Without this, it serves
+      # the old one for up to an hour. This runs after the upload so the website
+      # fetches the new file. A failure only warns: the downloads are already
+      # published, and the cache expires on its own.
+      - name: Refresh the website
+        env:
+          REVALIDATE_SECRET: ${{ secrets.WORKFLOW_LIBRARY_REVALIDATE_SECRET }}
+        run: |
+          set -uo pipefail
+          if [ -z "$REVALIDATE_SECRET" ]; then
+            echo "::warning title=Website not refreshed::The WORKFLOW_LIBRARY_REVALIDATE_SECRET secret isn't set."
+            exit 0
+          fi
+          if ! curl --fail-with-body --silent --show-error --max-time 30 --retry 3 \
+            -X POST https://prismic.io/api/revalidate-workflow-library \
+            -H "Authorization: Bearer $REVALIDATE_SECRET"; then
+            echo "::warning title=Website not refreshed::The revalidate request failed. The website shows the new library within an hour."
+          fi
