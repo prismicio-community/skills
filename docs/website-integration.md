@@ -12,6 +12,12 @@ These URLs never change. Fetch `library.json` when the website builds, not from 
 
 To build the same file locally, run `npm run build`. It writes to `dist/library.json`.
 
+## Refreshing the website
+
+The website caches `library.json` for up to an hour. After the upload, the release workflow sends `POST https://prismic.io/api/revalidate-workflow-library` with an `Authorization: Bearer <secret>` header, and the website drops its cache. The secret is `WORKFLOW_LIBRARY_REVALIDATE_SECRET`. It's set as a GitHub Actions secret in this repository and as an environment variable on the website, and the two values must match.
+
+If the request fails, or the secret isn't set, the workflow adds a warning to the run and still succeeds. The website then shows the change within an hour.
+
 ## library.json
 
 ```jsonc
